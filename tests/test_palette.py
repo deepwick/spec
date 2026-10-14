@@ -129,3 +129,37 @@ def test_dangling_text_color(palette_data):
 def test_load_palette_from_explicit_path(palette_data, write_palette):
     palette_data["name"] = "Test"
     assert load_palette(write_palette(palette_data)).name == "Test"
+
+
+@pytest.mark.parametrize(
+    ("mutate", "where"),
+    [
+        (lambda d: d["syntax"].__setitem__("comment", "comment"), "syntax.comment"),
+        (lambda d: d.__setitem__("colors", ["#04041a"]), "colors"),
+        (lambda d: d["terminal"].__setitem__("cursor", ["x"]), "terminal.cursor"),
+        (lambda d: d.__setitem__("textColors", "muted"), "textColors"),
+        (lambda d: d["syntax"]["comment"].__setitem__("style", "italic"), "syntax.comment.style"),
+        (lambda d: d.__setitem__("textColors", []), "textColors"),
+    ],
+)
+def test_wrong_shapes_raise_palette_error(palette_data, mutate, where):
+    mutate(palette_data)
+    with pytest.raises(PaletteError, match=where.replace(".", r"\.") + ": expected"):
+        parse_palette(palette_data)
+
+
+def test_top_level_must_be_object():
+    with pytest.raises(PaletteError, match="object"):
+        parse_palette(["not", "a", "dict"])
+
+
+def test_non_utf8_palette_file(tmp_path):
+    path = tmp_path / "palette.json"
+    path.write_bytes(b'{"name": "Caf\xe9"}')
+    with pytest.raises(PaletteError, match="palette.json"):
+        load_palette(path)
+
+
+def test_directory_as_palette_path(tmp_path):
+    with pytest.raises(PaletteError, match="cannot read"):
+        load_palette(tmp_path)

@@ -51,6 +51,10 @@ def load_palette(path: Path | None = None) -> Palette:
         raise PaletteError(f"palette file not found: {path}") from None
     except json.JSONDecodeError as e:
         raise PaletteError(f"{path}: invalid JSON: {e}") from None
+    except UnicodeDecodeError as e:
+        raise PaletteError(f"{path}: not UTF-8: {e}") from None
+    except OSError as e:
+        raise PaletteError(f"cannot read palette file {path}: {e.strerror}") from None
     return parse_palette(data)
 
 
@@ -59,7 +63,13 @@ def _check_hex(where: str, value: object) -> None:
         raise PaletteError(f"{where}: expected #rrggbb, got {value!r}")
 
 
+def _expect(where: str, value: object, kind: type, description: str) -> None:
+    if not isinstance(value, kind):
+        raise PaletteError(f"{where}: expected {description}, got {type(value).__name__}")
+
+
 def parse_palette(data: dict) -> Palette:
+    _expect("palette", data, dict, "an object")
     try:
         name = data["name"]
         colors = data["colors"]
@@ -70,6 +80,11 @@ def parse_palette(data: dict) -> Palette:
         text_colors = data["textColors"]
     except KeyError as e:
         raise PaletteError(f"missing top-level key: {e.args[0]}") from None
+    for key, value in (("colors", colors), ("ansi", ansi), ("terminal", terminal), ("ui", ui), ("syntax", syntax_raw)):
+        _expect(key, value, dict, "an object")
+    _expect("textColors", text_colors, list, "a list")
+    if not text_colors:
+        raise PaletteError("textColors: expected a non-empty list")
 
     for key, value in colors.items():
         _check_hex(f"colors.{key}", value)
@@ -84,7 +99,8 @@ def parse_palette(data: dict) -> Palette:
     for key, value in ansi.items():
         _check_hex(f"ansi.{key}", value)
 
-    def check_ref(where: str, color_name: str) -> None:
+    def check_ref(where: str, color_name: object) -> None:
+        _expect(where, color_name, str, "a color name")
         if color_name not in colors:
             raise PaletteError(f"{where}: unknown color name {color_name!r}")
 
@@ -95,9 +111,11 @@ def parse_palette(data: dict) -> Palette:
 
     syntax = {}
     for key, value in syntax_raw.items():
+        _expect(f"syntax.{key}", value, dict, "an object")
         color = value.get("color")
         if color is not None:
             check_ref(f"syntax.{key}.color", color)
+        _expect(f"syntax.{key}.style", value.get("style", []), list, "a list")
         style = tuple(value.get("style", ()))
         unknown = set(style) - STYLES
         if unknown:

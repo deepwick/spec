@@ -47,3 +47,20 @@ def test_check_workflow_is_reusable_and_runs_check_palette():
     text = (REPO / ".github" / "workflows" / "check.yml").read_text(encoding="utf-8")
     assert "workflow_call" in text
     assert "check-palette ." in text
+
+
+SPEC_SCOPES = [
+    "punctuation.definition.comment", "string.quoted.docstring", "keyword.other.documentation",
+    "keyword.operator.expression", "keyword.operator.cast", "keyword.operator.sizeof", "keyword.control.from",
+    "entity.name.namespace", "support.type", "meta.function-call", "support.function.magic",
+    "entity.name.function.decorator", "punctuation.definition.string", "string.quoted.include",
+    "punctuation.definition.string.begin.include", "keyword.preprocessor", "cls",
+    "support.type.property-name", "support.constant.property-value", "entity.other.attribute-name.class.css",
+    "punctuation.definition.group.regexp", "entity.other.attribute-name", "variable.other.object.property",
+]
+
+
+def test_readme_syntax_table_lists_every_spec_scope():
+    readme = (REPO / "README.md").read_text(encoding="utf-8")
+    missing = [scope for scope in SPEC_SCOPES if scope not in readme]
+    assert missing == []

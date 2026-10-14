@@ -79,34 +79,40 @@ bold text Foreground.
 ## Syntax roles
 
 Derived from Polywick Blue's TextMate and semantic token rules. Editor and
-syntax-highlighter ports follow this table.
+syntax-highlighter ports follow this table. Scopes are listed in full because
+the most specific matching scope wins: a port that only styles `punctuation`
+will paint comment markers and string quotes Foreground.
 
-| Role | TextMate scopes (representative) | Semantic tokens | Color | Style |
+| Role | TextMate scopes | Semantic tokens | Color | Style |
 |---|---|---|---|---|
-| comment | `comment`, docstrings, doc tags | `comment` | Comment | italic |
-| keyword | `keyword`, `storage.type`, `storage.modifier`, `constant.language`, `this`, `self` | `keyword` | Blue | |
-| control flow | `keyword.control`, `keyword.operator.new`, import/export | — | Magenta | |
-| operator | `keyword.operator`, `punctuation` | `operator` | Foreground | |
-| type | `entity.name.type`, `entity.name.class`, `support.class` | `namespace`, `type`, `class` | Teal | |
-| interface, enum, struct | `entity.name.type.interface/enum/struct` | `interface`, `enum`, `struct`, `typeParameter` | Mint | |
-| function | `entity.name.function`, `support.function`, decorators | `function`, `method` | Yellow | |
-| macro | `entity.name.function.macro` | `macro` | Magenta | |
-| variable | `variable`, `variable.parameter`, properties, attribute names | `variable`, `parameter`, `property` | Light Blue | |
-| constant | `variable.other.constant` | `*.readonly`, `enumMember` | Cyan | |
-| string | `string`, include paths, CSS values | `string` | Orange | |
-| escape | `constant.character.escape`, CSS selectors, regex groups | — | Gold | |
-| regex | `string.regexp` | `regexp` | Rose | |
-| number | `constant.numeric` | `number` | Sage | |
-| tag | `entity.name.tag` | — | Blue | |
-| tag bracket | `punctuation.definition.tag` | — | Muted | |
-| preprocessor | `meta.preprocessor` | — | Muted | bold |
-| preprocessor keyword | `keyword.control.directive` | — | Foreground | |
-| label | `entity.name.label` | `label` | Foreground | |
-| heading | `markup.heading` | — | Blue | bold |
-| bold, italic | `markup.bold`, `markup.italic` | — | inherit | bold, italic |
-| link, inline code | `markup.underline.link`, `markup.inline.raw` | — | Orange | |
-| invalid | `invalid` | — | Red | |
+| comment | `comment`, `punctuation.definition.comment`, `string.quoted.docstring`, `keyword.other.documentation`, `storage.type.class.jsdoc`, `storage.type.class.doxygen` | `comment` | Comment | italic |
+| keyword | `keyword`, `storage.type`, `storage.modifier`, `constant.language`, `constant.other`, `variable.language.this`, `keyword.other.using`, `keyword.other.namespace`, Python `self` / `cls` (`variable.parameter.function.language.special.self`, `variable.parameter.function.language.special.cls`) | `keyword` | Blue |  |
+| control flow | `keyword.control`, `keyword.operator.new`, `keyword.operator.expression`, `keyword.operator.cast`, `keyword.operator.sizeof`, `keyword.control.import`, `keyword.control.export`, `keyword.control.from` | — | Magenta |  |
+| operator / punctuation | `keyword.operator`, `punctuation` | `operator` | Foreground |  |
+| type | `entity.name.type`, `entity.name.class`, `entity.name.namespace`, `entity.name.scope-resolution`, `support.class`, `support.type` | `namespace`, `type`, `class` | Teal |  |
+| interface / enum / struct | `entity.name.type.interface`, `entity.name.type.enum`, `entity.name.type.enum-member`, `entity.name.type.struct`, `storage.type.struct` | `interface`, `enum`, `struct`, `typeParameter` | Mint |  |
+| function | `entity.name.function`, `entity.name.function.member`, `support.function`, `meta.function-call`, `support.function.magic`, `entity.name.function.decorator` | `function`, `method` | Yellow |  |
+| macro | `entity.name.function.macro` | `macro` | Magenta |  |
+| variable | `variable`, `entity.name.variable`, `variable.parameter`, `variable.other.property`, `variable.other.object.property`, `entity.other.attribute-name`, `support.type.property-name` (CSS, JSON) | `variable`, `parameter`, `property` | Light Blue |  |
+| constant | `variable.other.constant` | `*.readonly`, `enumMember` | Cyan |  |
+| string | `string`, `punctuation.definition.string`, `string.quoted.include`, `string.quoted.other.lt-gt.include`, `punctuation.definition.string.begin.include`, `punctuation.definition.string.end.include`, `support.constant.property-value` (CSS) | `string` | Orange |  |
+| escape | `constant.character.escape`, `entity.other.attribute-name.class.css`, `entity.other.attribute-name.id.css`, `punctuation.definition.group.regexp`, `punctuation.definition.character-class.regexp` | — | Gold |  |
+| regex | `string.regexp` | `regexp` | Rose |  |
+| number | `constant.numeric` | `number` | Sage |  |
+| tag | `entity.name.tag` | — | Blue |  |
+| tag bracket | `punctuation.definition.tag` | — | Muted |  |
+| preprocessor | `meta.preprocessor`, `entity.name.function.preprocessor` | — | Muted | bold |
+| preprocessor keyword | `keyword.control.directive`, `keyword.preprocessor` | — | Foreground |  |
+| label | `entity.name.label` | `label` | Foreground |  |
+| heading | `markup.heading`, `entity.name.section.markdown` | — | Blue | bold |
+| bold / italic | `markup.bold` / `markup.italic` | — | inherit | bold / italic |
+| link / inline code | `markup.underline.link`, `markup.inline.raw`, `markup.fenced_code.block` | — | Orange |  |
+| invalid | `invalid` | — | Red |  |
 | deprecated | `invalid.deprecated` | `*.deprecated` | Foreground | strikethrough |
+
+Source colors folded into the palette: struct `#86C691` → Mint; macro
+`#BD63C5` → Magenta; preprocessor and tag bracket `#808080` → Muted; label
+`#C8C8C8` → Foreground; include brackets `#E0B090` → Orange.
 
 The machine-readable version of everything above is [`palette.json`](palette.json).
 
