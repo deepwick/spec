@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "deepwick-spec"
+version = "0.1.0"
+description = "Deepwick palette spec and port linters"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+check-palette = "deepwick_spec.check_palette:main"
+check-contrast = "deepwick_spec.check_contrast:main"
+deepwick-swatches = "deepwick_spec.swatches:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["deepwick_spec"]
