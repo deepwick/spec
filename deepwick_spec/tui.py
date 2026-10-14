@@ -17,18 +17,26 @@ def _snapshot(base: list[str]) -> str:
     return subprocess.run([*base, "capture-pane", "-e", "-p", "-t", "0"], capture_output=True, text=True).stdout
 
 
-def _wait(base: list[str], wait_for: str | None, timeout: float, settle: float) -> str:
+def _alive(base: list[str]) -> bool:
+    return subprocess.run([*base, "has-session"], capture_output=True).returncode == 0
+
+
+def _wait(base: list[str], wait_for: str | None, timeout: float, settle: float, changed_from: str | None = None) -> str:
     deadline = time.monotonic() + timeout
     previous = None
     current = ""
+    matched = False
     while time.monotonic() < deadline:
         time.sleep(settle)
+        if not _alive(base):
+            raise TimeoutError(f"app exited before the pane was ready; last pane text:\n{plain(current)}")
         current = _snapshot(base)
-        if wait_for is not None:
-            if wait_for in plain(current):
-                time.sleep(settle)
-                return _snapshot(base)
-        elif current.strip() and current == previous:
+        if wait_for is not None and not matched:
+            matched = wait_for in plain(current)
+        ready = matched if wait_for is not None else bool(current.strip())
+        if changed_from is not None and current == changed_from:
+            ready = False
+        if ready and current == previous:
             return current
         previous = current
     target = f"for {wait_for!r}" if wait_for else "for the pane to settle"
@@ -43,6 +51,7 @@ def capture(
     wait_for: str | None = None,
     literal: str | None = None,
     keys: tuple[str, ...] = (),
+    after: str | None = None,
     timeout: float = 15.0,
     settle: float = 0.4,
 ) -> str:
@@ -60,6 +69,6 @@ def capture(
             subprocess.run([*base, "send-keys", "-t", "0", "-l", literal], check=True)
         for key in keys:
             subprocess.run([*base, "send-keys", "-t", "0", key], check=True)
-        return _wait(base, None, timeout, settle)
+        return _wait(base, after, timeout, settle, changed_from=None if after else text)
     finally:
         subprocess.run([*base, "kill-server"], capture_output=True)

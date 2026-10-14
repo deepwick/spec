@@ -33,3 +33,17 @@ def test_capture_uses_private_server_and_cleans_up():
     capture("printf 'x\\n'; sleep 30", wait_for="x")
     after = subprocess.run(["tmux", "-L", "default", "ls"], capture_output=True, text=True).stdout
     assert before == after
+
+
+def test_capture_waits_for_text_after_keys():
+    text = capture("sh -c 'echo ready; read x; sleep 1; echo got-$x; sleep 30'", wait_for="ready", literal="abc", keys=("Enter",), after="got-abc")
+    assert "got-abc" in text
+
+
+def test_capture_reports_dead_app_quickly():
+    import time
+
+    start = time.monotonic()
+    with pytest.raises(TimeoutError, match="exited"):
+        capture("true", wait_for="never", timeout=10)
+    assert time.monotonic() - start < 5
