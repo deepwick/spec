@@ -140,9 +140,12 @@ ones that apply in their README Notes, using these descriptions:
   Mint role appears only where a language server supplies semantic tokens.
   Macro definitions are captured as macros (Magenta) rather than preprocessor
   (Muted bold).
-- **Tree-sitter without per-language overrides** (Helix, Zed): Python's `and`,
+- **Tree-sitter without per-language overrides** (Helix): Python's `and`,
   `or`, `not`, `is` share the capture used for `typeof`/`new`, so they take the
   control-flow color; Python builtin types take the keyword color.
+- **Zed's Python grammar** captures control-flow keywords (`if`, `for`,
+  `return`, `import`, …) and `and`/`or`/`not`/`is` as plain keywords, so they
+  take the keyword color (Blue); builtin types take the type color (Teal).
 - **TextMate grammars** (bat): no scope marks macro uses or C/C++ builtin types
   separately from other identifiers and keywords.
 - **Terminal-rendered formats**: zsh `region_highlight` has no italic, so
