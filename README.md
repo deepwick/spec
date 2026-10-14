@@ -130,6 +130,25 @@ Source colors folded into the palette: struct `#86C691` → Mint; macro
 
 The machine-readable version of everything above is [`palette.json`](palette.json).
 
+## Engine limitations
+
+Some roles cannot be expressed by every highlighting engine. Ports state the
+ones that apply in their README Notes, using these descriptions:
+
+- **Tree-sitter without semantic tokens** (Neovim without LSP, Helix, Zed): no
+  capture distinguishes interfaces, enums, and structs from other types, so the
+  Mint role appears only where a language server supplies semantic tokens.
+  Macro definitions are captured as macros (Magenta) rather than preprocessor
+  (Muted bold).
+- **Tree-sitter without per-language overrides** (Helix, Zed): Python's `and`,
+  `or`, `not`, `is` share the capture used for `typeof`/`new`, so they take the
+  control-flow color; Python builtin types take the keyword color.
+- **TextMate grammars** (bat): no scope marks macro uses or C/C++ builtin types
+  separately from other identifiers and keywords.
+- **Terminal-rendered formats**: zsh `region_highlight` has no italic, so
+  zsh-syntax-highlighting comments are not italic; bat draws italics only with
+  `--italic-text=always`; Ptyxis has no selection color.
+
 ## Rules for ports
 
 Each port lives in its own repository, `deepwick/<app>`.

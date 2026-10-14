@@ -1,0 +1,35 @@
+import pytest
+
+from deepwick_spec.ansi import style_of
+from deepwick_spec.tui import capture, tmux_available
+
+pytestmark = pytest.mark.skipif(not tmux_available(), reason="requires tmux")
+
+
+def test_capture_sees_truecolor_output():
+    text = capture(r"printf '\033[38;2;86;156;214mblue\033[0m\n'; sleep 30", wait_for="blue")
+    assert style_of(text, "blue")["fg"] == "#569cd6"
+
+
+def test_capture_passes_environment():
+    text = capture('printf "%s\\n" "$DEEPWICK_PROBE $COLORTERM"; sleep 30', {"DEEPWICK_PROBE": "probe-ok"}, wait_for="probe-ok")
+    assert "probe-ok truecolor" in text
+
+
+def test_capture_types_literal_text_and_keys():
+    text = capture("printf 'ready\\n'; cat", wait_for="ready", literal="hello deepwick", keys=("Enter",))
+    assert text.count("hello deepwick") == 2
+
+
+def test_capture_times_out_with_pane_text():
+    with pytest.raises(TimeoutError, match="still waiting"):
+        capture("printf 'still waiting\\n'; sleep 30", wait_for="never shown", timeout=1.5)
+
+
+def test_capture_uses_private_server_and_cleans_up():
+    import subprocess
+
+    before = subprocess.run(["tmux", "-L", "default", "ls"], capture_output=True, text=True).stdout
+    capture("printf 'x\\n'; sleep 30", wait_for="x")
+    after = subprocess.run(["tmux", "-L", "default", "ls"], capture_output=True, text=True).stdout
+    assert before == after
