@@ -35,7 +35,7 @@ def test_c_sample_compiles():
 def test_terminal_script_runs():
     result = subprocess.run(["bash", str(SAMPLES / "terminal.sh")], capture_output=True, text=True, timeout=60)
     assert result.returncode == 0, result.stderr
-    for marker in ["ANSI 16", "\x1b[31m", "\x1b[97m", "$ ls -la", "diff --git", "Merge branch feature"]:
+    for marker in ["ANSI 16", "\x1b[31m", "\x1b[97m", "$ ls -lgoA", "diff --git", "Merge branch feature"]:
         assert marker in result.stdout, marker
 
 
@@ -44,3 +44,10 @@ def test_samples_contain_no_hex_colors():
 
     for path in SAMPLES.iterdir():
         assert list(find_colors(path.read_text(encoding="utf-8"))) == [], path.name
+
+
+def test_terminal_script_hides_user_and_group():
+    import getpass
+
+    result = subprocess.run(["bash", str(SAMPLES / "terminal.sh")], capture_output=True, text=True, timeout=60)
+    assert getpass.getuser() not in result.stdout

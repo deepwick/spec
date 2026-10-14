@@ -49,8 +49,8 @@ g merge -q --no-ff feature -m "Merge branch feature"
 sed -i 's/Hello/Hi/' src/app.py
 printf 'scratch\n' > untracked.txt
 
-printf '\n  $ ls -la --color=always\n'
-ls -la --color=always
+printf '\n  $ ls -lgoA --color=always\n'
+ls -lgoA --color=always
 printf '\n  $ git diff\n'
 g diff
 printf '\n  $ git log --graph --oneline --decorate --all\n'
