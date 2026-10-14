@@ -1,5 +1,7 @@
 # Deepwick
 
+<p align="center"><img src="logo/deepwick.svg" width="160" alt="Deepwick logo"></p>
+
 A deep navy theme with Visual Studio 2022's familiar syntax colors, for every
 tool you use. This repository is the **specification**: the palette, the rules
 every port follows, and the tools that check them.

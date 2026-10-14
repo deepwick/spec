@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#081421" /> 
+      <stop offset="100%" stop-color="#12233b" /> 
+    </linearGradient>
+    
+    <linearGradient id="tealBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4EC9B0" /> 
+      <stop offset="100%" stop-color="#569CD6" /> 
+    </linearGradient>
+
+    <style>
+      /* Base line hiding before animation starts */
+      .draw-line {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* Staggered drawing sequences */
+      .d-stem {
+        stroke-dasharray: 260;
+        stroke-dashoffset: 260;
+        animation: drawLine 0.6s ease-out forwards;
+      }
+
+      .d-loop {
+        stroke-dasharray: 480;
+        stroke-dashoffset: 480;
+        /* Starts slightly before the stem finishes */
+        animation: drawLine 0.7s ease-out 0.4s forwards;
+      }
+
+      .w-path {
+        stroke-dasharray: 500;
+        stroke-dashoffset: 500;
+        /* Starts as the loop finishes */
+        animation: drawLine 0.9s ease-in-out 0.9s forwards;
+      }
+
+      /* Node popping effects */
+      .node {
+        opacity: 0;
+        animation: popNode 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+      
+      /* Warm String node caps the stem early */
+      .node-top {
+        transform-origin: 255px 120px;
+        animation-delay: 0.6s;
+      }
+      
+      /* Green Comment node finishes the animation */
+      .node-end {
+        transform-origin: 410px 230px;
+        animation-delay: 1.8s;
+      }
+
+      @keyframes drawLine {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes popNode {
+        0% {
+          opacity: 0;
+          transform: scale(0);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    </style>
+  </defs>
+  
+  <!-- Canvas -->
+  <rect width="500" height="500" rx="110" fill="url(#bg)" />
+
+  <g>
+    <!-- Bouncy 'd' component -->
+    <path class="draw-line d-stem" d="M 255 120 Q 240 280 255 360" stroke="#DCDCAA" stroke-width="50" />
+    <circle class="draw-line d-loop" cx="180" cy="290" r="75" stroke="#DCDCAA" stroke-width="50" /> 
+    
+    <!-- Fluid 'w' component -->
+    <path class="draw-line w-path" d="M 245 250 C 275 420, 310 380, 325 280 C 340 380, 380 420, 410 230" stroke="url(#tealBlue)" stroke-width="50" />
+    
+    <!-- Syntax color nodes -->
+    <circle class="node node-top" cx="255" cy="120" r="25" fill="#CE9178" />
+    <circle class="node node-end" cx="410" cy="230" r="25" fill="#57A64A" />
+  </g>
+</svg>
