@@ -43,10 +43,10 @@ def test_workflows_are_valid_yaml(name):
     )
 
 
-def test_check_workflow_is_reusable_and_runs_check_palette():
+def test_check_workflow_is_reusable_and_runs_check_port():
     text = (REPO / ".github" / "workflows" / "check.yml").read_text(encoding="utf-8")
     assert "workflow_call" in text
-    assert "check-palette ." in text
+    assert "check-port ." in text
 
 
 SPEC_SCOPES = [

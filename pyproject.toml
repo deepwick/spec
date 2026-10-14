@@ -13,6 +13,7 @@ dependencies = []
 [project.scripts]
 check-palette = "deepwick_spec.check_palette:main"
 check-contrast = "deepwick_spec.check_contrast:main"
+check-port = "deepwick_spec.check_port:main"
 deepwick-swatches = "deepwick_spec.swatches:main"
 
 [dependency-groups]

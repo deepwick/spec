@@ -15,4 +15,4 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install "deepwick-spec @ git+https://github.com/deepwick/spec@${{ inputs.spec-ref }}"
-      - run: check-palette .
+      - run: check-port .

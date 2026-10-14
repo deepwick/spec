@@ -166,6 +166,7 @@ Python 3.11+, no dependencies.
 pip install "deepwick-spec @ git+https://github.com/deepwick/spec@main"
 
 check-palette [PATH]      # report colors not in the palette (exit 1 if any)
+check-port [PATH]         # check a port repo: README credit + tested version, LICENSE, CI, screenshot, palette
 check-contrast            # verify text colors meet 4.5:1 on Background
 deepwick-swatches -o swatches.svg
 ```
