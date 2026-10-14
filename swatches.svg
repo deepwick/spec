@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1588" height="666" viewBox="0 0 1588 666">
+<rect width="100%" height="100%" fill="#04041a"/>
+<text x="32" y="60" fill="#D4D4D4" font-family="sans-serif" font-size="28" font-weight="bold">Deepwick</text>
+<rect x="32" y="88" width="180" height="90" rx="8" fill="#04041a" stroke="#1B2140"/>
+<text x="46" y="126" fill="#D4D4D4" font-family="monospace" font-size="16">background</text>
+<text x="46" y="152" fill="#D4D4D4" font-family="monospace" font-size="14">#04041a</text>
+<rect x="224" y="88" width="180" height="90" rx="8" fill="#10192C" stroke="#1B2140"/>
+<text x="238" y="126" fill="#D4D4D4" font-family="monospace" font-size="16">surface</text>
+<text x="238" y="152" fill="#D4D4D4" font-family="monospace" font-size="14">#10192C</text>
+<rect x="416" y="88" width="180" height="90" rx="8" fill="#1B2140" stroke="#1B2140"/>
+<text x="430" y="126" fill="#D4D4D4" font-family="monospace" font-size="16">overlay</text>
+<text x="430" y="152" fill="#D4D4D4" font-family="monospace" font-size="14">#1B2140</text>
+<rect x="608" y="88" width="180" height="90" rx="8" fill="#264F78" stroke="#1B2140"/>
+<text x="622" y="126" fill="#D4D4D4" font-family="monospace" font-size="16">selection</text>
+<text x="622" y="152" fill="#D4D4D4" font-family="monospace" font-size="14">#264F78</text>
+<rect x="800" y="88" width="180" height="90" rx="8" fill="#6E7899" stroke="#1B2140"/>
+<text x="814" y="126" fill="#04041a" font-family="monospace" font-size="16">muted</text>
+<text x="814" y="152" fill="#04041a" font-family="monospace" font-size="14">#6E7899</text>
+<rect x="992" y="88" width="180" height="90" rx="8" fill="#7A86A8" stroke="#1B2140"/>
+<text x="1006" y="126" fill="#04041a" font-family="monospace" font-size="16">comment</text>
+<text x="1006" y="152" fill="#04041a" font-family="monospace" font-size="14">#7A86A8</text>
+<rect x="1184" y="88" width="180" height="90" rx="8" fill="#D4D4D4" stroke="#1B2140"/>
+<text x="1198" y="126" fill="#04041a" font-family="monospace" font-size="16">foreground</text>
+<text x="1198" y="152" fill="#04041a" font-family="monospace" font-size="14">#D4D4D4</text>
+<rect x="1376" y="88" width="180" height="90" rx="8" fill="#569CD6" stroke="#1B2140"/>
+<text x="1390" y="126" fill="#04041a" font-family="monospace" font-size="16">blue</text>
+<text x="1390" y="152" fill="#04041a" font-family="monospace" font-size="14">#569CD6</text>
+<rect x="32" y="190" width="180" height="90" rx="8" fill="#9CDCFE" stroke="#1B2140"/>
+<text x="46" y="228" fill="#04041a" font-family="monospace" font-size="16">lightBlue</text>
+<text x="46" y="254" fill="#04041a" font-family="monospace" font-size="14">#9CDCFE</text>
+<rect x="224" y="190" width="180" height="90" rx="8" fill="#4FC1FF" stroke="#1B2140"/>
+<text x="238" y="228" fill="#04041a" font-family="monospace" font-size="16">cyan</text>
+<text x="238" y="254" fill="#04041a" font-family="monospace" font-size="14">#4FC1FF</text>
+<rect x="416" y="190" width="180" height="90" rx="8" fill="#4EC9B0" stroke="#1B2140"/>
+<text x="430" y="228" fill="#04041a" font-family="monospace" font-size="16">teal</text>
+<text x="430" y="254" fill="#04041a" font-family="monospace" font-size="14">#4EC9B0</text>
+<rect x="608" y="190" width="180" height="90" rx="8" fill="#B8D7A3" stroke="#1B2140"/>
+<text x="622" y="228" fill="#04041a" font-family="monospace" font-size="16">mint</text>
+<text x="622" y="254" fill="#04041a" font-family="monospace" font-size="14">#B8D7A3</text>
+<rect x="800" y="190" width="180" height="90" rx="8" fill="#DCDCAA" stroke="#1B2140"/>
+<text x="814" y="228" fill="#04041a" font-family="monospace" font-size="16">yellow</text>
+<text x="814" y="254" fill="#04041a" font-family="monospace" font-size="14">#DCDCAA</text>
+<rect x="992" y="190" width="180" height="90" rx="8" fill="#D7BA7D" stroke="#1B2140"/>
+<text x="1006" y="228" fill="#04041a" font-family="monospace" font-size="16">gold</text>
+<text x="1006" y="254" fill="#04041a" font-family="monospace" font-size="14">#D7BA7D</text>
+<rect x="1184" y="190" width="180" height="90" rx="8" fill="#CE9178" stroke="#1B2140"/>
+<text x="1198" y="228" fill="#04041a" font-family="monospace" font-size="16">orange</text>
+<text x="1198" y="254" fill="#04041a" font-family="monospace" font-size="14">#CE9178</text>
+<rect x="1376" y="190" width="180" height="90" rx="8" fill="#D16969" stroke="#1B2140"/>
+<text x="1390" y="228" fill="#04041a" font-family="monospace" font-size="16">rose</text>
+<text x="1390" y="254" fill="#04041a" font-family="monospace" font-size="14">#D16969</text>
+<rect x="32" y="292" width="180" height="90" rx="8" fill="#C586C0" stroke="#1B2140"/>
+<text x="46" y="330" fill="#04041a" font-family="monospace" font-size="16">magenta</text>
+<text x="46" y="356" fill="#04041a" font-family="monospace" font-size="14">#C586C0</text>
+<rect x="224" y="292" width="180" height="90" rx="8" fill="#B5CEA8" stroke="#1B2140"/>
+<text x="238" y="330" fill="#04041a" font-family="monospace" font-size="16">sage</text>
+<text x="238" y="356" fill="#04041a" font-family="monospace" font-size="14">#B5CEA8</text>
+<rect x="416" y="292" width="180" height="90" rx="8" fill="#57A64A" stroke="#1B2140"/>
+<text x="430" y="330" fill="#04041a" font-family="monospace" font-size="16">green</text>
+<text x="430" y="356" fill="#04041a" font-family="monospace" font-size="14">#57A64A</text>
+<rect x="608" y="292" width="180" height="90" rx="8" fill="#F44747" stroke="#1B2140"/>
+<text x="622" y="330" fill="#04041a" font-family="monospace" font-size="16">red</text>
+<text x="622" y="356" fill="#04041a" font-family="monospace" font-size="14">#F44747</text>
+<rect x="800" y="292" width="180" height="90" rx="8" fill="#FFFFFF" stroke="#1B2140"/>
+<text x="814" y="330" fill="#04041a" font-family="monospace" font-size="16">white</text>
+<text x="814" y="356" fill="#04041a" font-family="monospace" font-size="14">#FFFFFF</text>
+<text x="32" y="422" fill="#D4D4D4" font-family="sans-serif" font-size="20" font-weight="bold">ANSI 16</text>
+<rect x="32" y="442" width="180" height="90" rx="8" fill="#1B2140" stroke="#1B2140"/>
+<text x="46" y="480" fill="#D4D4D4" font-family="monospace" font-size="16">black</text>
+<text x="46" y="506" fill="#D4D4D4" font-family="monospace" font-size="14">#1B2140</text>
+<rect x="224" y="442" width="180" height="90" rx="8" fill="#F44747" stroke="#1B2140"/>
+<text x="238" y="480" fill="#04041a" font-family="monospace" font-size="16">red</text>
+<text x="238" y="506" fill="#04041a" font-family="monospace" font-size="14">#F44747</text>
+<rect x="416" y="442" width="180" height="90" rx="8" fill="#57A64A" stroke="#1B2140"/>
+<text x="430" y="480" fill="#04041a" font-family="monospace" font-size="16">green</text>
+<text x="430" y="506" fill="#04041a" font-family="monospace" font-size="14">#57A64A</text>
+<rect x="608" y="442" width="180" height="90" rx="8" fill="#DCDCAA" stroke="#1B2140"/>
+<text x="622" y="480" fill="#04041a" font-family="monospace" font-size="16">yellow</text>
+<text x="622" y="506" fill="#04041a" font-family="monospace" font-size="14">#DCDCAA</text>
+<rect x="800" y="442" width="180" height="90" rx="8" fill="#569CD6" stroke="#1B2140"/>
+<text x="814" y="480" fill="#04041a" font-family="monospace" font-size="16">blue</text>
+<text x="814" y="506" fill="#04041a" font-family="monospace" font-size="14">#569CD6</text>
+<rect x="992" y="442" width="180" height="90" rx="8" fill="#C586C0" stroke="#1B2140"/>
+<text x="1006" y="480" fill="#04041a" font-family="monospace" font-size="16">magenta</text>
+<text x="1006" y="506" fill="#04041a" font-family="monospace" font-size="14">#C586C0</text>
+<rect x="1184" y="442" width="180" height="90" rx="8" fill="#4EC9B0" stroke="#1B2140"/>
+<text x="1198" y="480" fill="#04041a" font-family="monospace" font-size="16">cyan</text>
+<text x="1198" y="506" fill="#04041a" font-family="monospace" font-size="14">#4EC9B0</text>
+<rect x="1376" y="442" width="180" height="90" rx="8" fill="#D4D4D4" stroke="#1B2140"/>
+<text x="1390" y="480" fill="#04041a" font-family="monospace" font-size="16">white</text>
+<text x="1390" y="506" fill="#04041a" font-family="monospace" font-size="14">#D4D4D4</text>
+<rect x="32" y="544" width="180" height="90" rx="8" fill="#6E7899" stroke="#1B2140"/>
+<text x="46" y="582" fill="#04041a" font-family="monospace" font-size="16">brightBlack</text>
+<text x="46" y="608" fill="#04041a" font-family="monospace" font-size="14">#6E7899</text>
+<rect x="224" y="544" width="180" height="90" rx="8" fill="#FF7A7A" stroke="#1B2140"/>
+<text x="238" y="582" fill="#04041a" font-family="monospace" font-size="16">brightRed</text>
+<text x="238" y="608" fill="#04041a" font-family="monospace" font-size="14">#FF7A7A</text>
+<rect x="416" y="544" width="180" height="90" rx="8" fill="#7FC46E" stroke="#1B2140"/>
+<text x="430" y="582" fill="#04041a" font-family="monospace" font-size="16">brightGreen</text>
+<text x="430" y="608" fill="#04041a" font-family="monospace" font-size="14">#7FC46E</text>
+<rect x="608" y="544" width="180" height="90" rx="8" fill="#F2F2C4" stroke="#1B2140"/>
+<text x="622" y="582" fill="#04041a" font-family="monospace" font-size="16">brightYellow</text>
+<text x="622" y="608" fill="#04041a" font-family="monospace" font-size="14">#F2F2C4</text>
+<rect x="800" y="544" width="180" height="90" rx="8" fill="#9CDCFE" stroke="#1B2140"/>
+<text x="814" y="582" fill="#04041a" font-family="monospace" font-size="16">brightBlue</text>
+<text x="814" y="608" fill="#04041a" font-family="monospace" font-size="14">#9CDCFE</text>
+<rect x="992" y="544" width="180" height="90" rx="8" fill="#E0A8DC" stroke="#1B2140"/>
+<text x="1006" y="582" fill="#04041a" font-family="monospace" font-size="16">brightMagenta</text>
+<text x="1006" y="608" fill="#04041a" font-family="monospace" font-size="14">#E0A8DC</text>
+<rect x="1184" y="544" width="180" height="90" rx="8" fill="#7FE5CF" stroke="#1B2140"/>
+<text x="1198" y="582" fill="#04041a" font-family="monospace" font-size="16">brightCyan</text>
+<text x="1198" y="608" fill="#04041a" font-family="monospace" font-size="14">#7FE5CF</text>
+<rect x="1376" y="544" width="180" height="90" rx="8" fill="#FFFFFF" stroke="#1B2140"/>
+<text x="1390" y="582" fill="#04041a" font-family="monospace" font-size="16">brightWhite</text>
+<text x="1390" y="608" fill="#04041a" font-family="monospace" font-size="14">#FFFFFF</text>
+</svg>
