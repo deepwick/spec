@@ -18,10 +18,36 @@ _COLOR = re.compile(
 )
 
 
+_RGB_FUNC = re.compile(
+    r"(?<![\w-])rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*[\d.]+%?\s*)?\)",
+    re.IGNORECASE,
+)
+_RGB_VALUE = re.compile(r"^\s*[^\s=#;][^=]*=\s*((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3}))\s*$")
+_TRIPLE = re.compile(r"(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})")
+
+
+def _in_range(*components: str) -> bool:
+    return all(int(c) <= 255 for c in components)
+
+
+def to_hex(raw: str) -> str:
+    if raw.startswith("#") or raw[:2].lower() == "0x":
+        return normalize_hex(raw)
+    match = _TRIPLE.search(raw)
+    if not match or not _in_range(*match.groups()):
+        raise ValueError(f"not a color: {raw!r}")
+    return "#" + "".join(f"{int(c):02x}" for c in match.groups())
+
+
 def find_colors(text: str) -> Iterator[tuple[int, int, str]]:
     for lineno, line in enumerate(text.splitlines(), start=1):
-        for match in _COLOR.finditer(line):
-            yield lineno, match.start() + 1, match.group(0)
+        hits = [(m.start(), m.group(0)) for m in _COLOR.finditer(line)]
+        hits += [(m.start(), m.group(0)) for m in _RGB_FUNC.finditer(line) if _in_range(*m.groups())]
+        value = _RGB_VALUE.match(line)
+        if value and _in_range(*value.groups()[1:]):
+            hits.append((value.start(1), value.group(1)))
+        for start, raw in sorted(hits):
+            yield lineno, start + 1, raw
 
 
 def parse_allow_file(text: str) -> frozenset[str]:
@@ -30,8 +56,9 @@ def parse_allow_file(text: str) -> frozenset[str]:
         tokens = line.split()
         if not tokens:
             continue
+        candidate = tokens[0] if tokens[0].startswith(("#", "0x", "0X")) else line.split("#")[0]
         try:
-            allowed.add(normalize_hex(tokens[0]))
+            allowed.add(to_hex(candidate.strip()))
         except ValueError:
             continue
     return frozenset(allowed)
@@ -106,7 +133,7 @@ def scan(root: Path, allowed: frozenset[str]) -> tuple[list[Violation], int]:
         checked += 1
         shown = path.relative_to(root).as_posix() if root.is_dir() else str(path)
         for line, col, raw in find_colors(text):
-            if normalize_hex(raw) not in permitted:
+            if to_hex(raw) not in permitted:
                 violations.append(Violation(shown, line, col, raw))
     return violations, checked
 

@@ -156,12 +156,14 @@ check-contrast            # verify text colors meet 4.5:1 on Background
 deepwick-swatches -o swatches.svg
 ```
 
-`check-palette` recognizes `#rgb`, `#rrggbb`, `#rrggbbaa`, and `0xRRGGBB`.
-Alpha suffixes are fine when the base color is in the palette. Two optional
+`check-palette` recognizes `#rgb`, `#rrggbb`, `#rrggbbaa`, `0xRRGGBB`,
+`rgb(R, G, B)` / `rgba(R, G, B, A)`, and a bare `R,G,B` when it is the whole
+value of a `key=value` line (Konsole's `Color=4,4,26`). Alpha is ignored when
+the base color is in the palette. Two optional
 files at the root of a port tune it:
 
-- `.palette-allow` — extra permitted colors, one per line. Comments start with
-  `# ` (hash, space): `#000000  # pure black required by the format`
+- `.palette-allow` — extra permitted colors, one per line, as hex or `R,G,B`.
+  Comments start with `# ` (hash, space): `#000000  # pure black required by the format`
 - `.palette-ignore` — glob patterns of paths to skip, e.g. `vendor/`
 
 Port CI is a single job:
