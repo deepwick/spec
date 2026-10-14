@@ -130,6 +130,37 @@ Source colors folded into the palette: struct `#86C691` → Mint; macro
 
 The machine-readable version of everything above is [`palette.json`](palette.json).
 
+## File listing roles
+
+For file managers and `ls`-style listings (dircolors, eza, yazi). Git status
+columns use the UI roles above: added Green, modified Blue, removed Red,
+untracked or new Teal.
+
+| Role | Color | Style |
+|---|---|---|
+| `directory` | Blue | bold |
+| `executable` | Green | bold |
+| `symlink` | Cyan | |
+| `brokenSymlink` | Red | |
+| `special` | Gold | |
+| `archive` | Rose | |
+| `media` | Magenta | |
+| `document` | Orange | |
+| `source` | Yellow | |
+| `temp` | Muted | |
+| `permRead` | Yellow | |
+| `permWrite` | Red | |
+| `permExec` | Green | |
+| `size` | Sage | |
+| `user` | Light Blue | |
+| `group` | Comment | |
+| `date` | Comment | |
+
+`special` covers sockets, FIFOs and devices; `media` covers images, audio and
+video; `document` covers PDFs, office files and plain text; `source` covers
+source code and build files; `temp` covers temporary, backup, swap and
+compiled files.
+
 ## Engine limitations
 
 Some roles cannot be expressed by every highlighting engine. Ports state the

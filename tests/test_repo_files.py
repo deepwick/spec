@@ -1,3 +1,4 @@
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -64,3 +65,15 @@ def test_readme_syntax_table_lists_every_spec_scope():
     readme = (REPO / "README.md").read_text(encoding="utf-8")
     missing = [scope for scope in SPEC_SCOPES if scope not in readme]
     assert missing == []
+
+
+def _display(name: str) -> str:
+    return re.sub(r"(?<!^)([A-Z])", r" \1", name).title()
+
+
+def test_readme_files_table_matches_palette():
+    readme = (REPO / "README.md").read_text(encoding="utf-8")
+    palette = load_palette()
+    for role, style in palette.files.items():
+        row = f"| `{role}` | {_display(style.color)} | {' '.join(style.style)} |"
+        assert row.replace("|  |", "| |") in readme.replace("|  |", "| |"), row

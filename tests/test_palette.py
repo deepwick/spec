@@ -182,3 +182,36 @@ def test_foreground_readable_on_diff_backgrounds():
     c = load_palette().colors
     for name in ("diffAdded", "diffRemoved", "diffChanged", "diffAddedEmph", "diffRemovedEmph", "diffText"):
         assert contrast_ratio(c["foreground"], c[name]) >= 7, name
+
+
+FILE_ROLES = {
+    "directory", "executable", "symlink", "brokenSymlink", "special", "archive", "media", "document",
+    "source", "temp", "permRead", "permWrite", "permExec", "size", "user", "group", "date",
+}
+
+
+def test_file_listing_roles():
+    palette = load_palette()
+    assert set(palette.files) == FILE_ROLES
+    assert palette.files["directory"] == SyntaxStyle("blue", ("bold",))
+    assert palette.files["executable"] == SyntaxStyle("green", ("bold",))
+    assert palette.files["brokenSymlink"] == SyntaxStyle("red")
+    assert all(style.color in palette.text_colors for style in palette.files.values())
+
+
+def test_missing_files_section(palette_data):
+    del palette_data["files"]
+    with pytest.raises(PaletteError, match="missing top-level key: files"):
+        parse_palette(palette_data)
+
+
+def test_dangling_files_reference(palette_data):
+    palette_data["files"]["directory"]["color"] = "nope"
+    with pytest.raises(PaletteError, match=r"files\.directory\.color"):
+        parse_palette(palette_data)
+
+
+def test_unknown_files_style(palette_data):
+    palette_data["files"]["directory"]["style"] = ["blink"]
+    with pytest.raises(PaletteError, match=r"files\.directory\.style"):
+        parse_palette(palette_data)

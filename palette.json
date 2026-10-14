@@ -105,6 +105,25 @@
     "invalid": { "color": "red" },
     "deprecated": { "color": "foreground", "style": ["strikethrough"] }
   },
+  "files": {
+    "directory": { "color": "blue", "style": ["bold"] },
+    "executable": { "color": "green", "style": ["bold"] },
+    "symlink": { "color": "cyan" },
+    "brokenSymlink": { "color": "red" },
+    "special": { "color": "gold" },
+    "archive": { "color": "rose" },
+    "media": { "color": "magenta" },
+    "document": { "color": "orange" },
+    "source": { "color": "yellow" },
+    "temp": { "color": "muted" },
+    "permRead": { "color": "yellow" },
+    "permWrite": { "color": "red" },
+    "permExec": { "color": "green" },
+    "size": { "color": "sage" },
+    "user": { "color": "lightBlue" },
+    "group": { "color": "comment" },
+    "date": { "color": "comment" }
+  },
   "textColors": [
     "muted", "comment", "foreground", "blue", "lightBlue", "cyan", "teal", "mint",
     "yellow", "gold", "orange", "rose", "magenta", "sage", "green", "red", "white"

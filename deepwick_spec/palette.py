@@ -30,6 +30,7 @@ class Palette:
     terminal: dict[str, str]
     ui: dict[str, str]
     syntax: dict[str, SyntaxStyle]
+    files: dict[str, SyntaxStyle]
     text_colors: tuple[str, ...]
 
     def allowed_hex(self) -> frozenset[str]:
@@ -77,10 +78,11 @@ def parse_palette(data: dict) -> Palette:
         terminal = data["terminal"]
         ui = data["ui"]
         syntax_raw = data["syntax"]
+        files_raw = data["files"]
         text_colors = data["textColors"]
     except KeyError as e:
         raise PaletteError(f"missing top-level key: {e.args[0]}") from None
-    for key, value in (("colors", colors), ("ansi", ansi), ("terminal", terminal), ("ui", ui), ("syntax", syntax_raw)):
+    for key, value in (("colors", colors), ("ansi", ansi), ("terminal", terminal), ("ui", ui), ("syntax", syntax_raw), ("files", files_raw)):
         _expect(key, value, dict, "an object")
     _expect("textColors", text_colors, list, "a list")
     if not text_colors:
@@ -109,20 +111,25 @@ def parse_palette(data: dict) -> Palette:
     for key, value in ui.items():
         check_ref(f"ui.{key}", value)
 
-    syntax = {}
-    for key, value in syntax_raw.items():
-        _expect(f"syntax.{key}", value, dict, "an object")
-        color = value.get("color")
-        if color is not None:
-            check_ref(f"syntax.{key}.color", color)
-        _expect(f"syntax.{key}.style", value.get("style", []), list, "a list")
-        style = tuple(value.get("style", ()))
-        unknown = set(style) - STYLES
-        if unknown:
-            raise PaletteError(f"syntax.{key}.style: unknown style(s) {sorted(unknown)}")
-        syntax[key] = SyntaxStyle(color, style)
+    def parse_styles(section: str, raw: dict) -> dict[str, SyntaxStyle]:
+        parsed = {}
+        for key, value in raw.items():
+            _expect(f"{section}.{key}", value, dict, "an object")
+            color = value.get("color")
+            if color is not None:
+                check_ref(f"{section}.{key}.color", color)
+            _expect(f"{section}.{key}.style", value.get("style", []), list, "a list")
+            style = tuple(value.get("style", ()))
+            unknown = set(style) - STYLES
+            if unknown:
+                raise PaletteError(f"{section}.{key}.style: unknown style(s) {sorted(unknown)}")
+            parsed[key] = SyntaxStyle(color, style)
+        return parsed
+
+    syntax = parse_styles("syntax", syntax_raw)
+    files = parse_styles("files", files_raw)
 
     for color_name in text_colors:
         check_ref("textColors", color_name)
 
-    return Palette(name, dict(colors), dict(ansi), dict(terminal), dict(ui), syntax, tuple(text_colors))
+    return Palette(name, dict(colors), dict(ansi), dict(terminal), dict(ui), syntax, files, tuple(text_colors))
