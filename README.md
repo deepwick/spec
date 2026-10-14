@@ -39,6 +39,20 @@ at least 4.5:1.
 | Red | `#F44747` | errors, invalid, git removed | 5.63 |
 | White | `#FFFFFF` | ANSI bright white, emphasis | 20.24 |
 
+### Diff backgrounds
+
+Solid blends of Green, Red, and Blue over Background, for diff lines and the
+changed words inside them. Foreground stays at least 7:1 on each.
+
+| Name | Hex | Role | Blend |
+|---|---|---|---|
+| diffAdded | `#152424` | added line background | 20% Green |
+| diffRemoved | `#341123` | removed line background | 20% Red |
+| diffChanged | `#142240` | changed line background | 20% Blue |
+| diffAddedEmph | `#1D3528` | added words within a line | 30% Green |
+| diffRemovedEmph | `#4C1828` | removed words within a line | 30% Red |
+| diffText | `#1D3252` | changed words within a line | 30% Blue |
+
 ## ANSI 16
 
 | Color | Normal | Bright |

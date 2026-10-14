@@ -163,3 +163,22 @@ def test_non_utf8_palette_file(tmp_path):
 def test_directory_as_palette_path(tmp_path):
     with pytest.raises(PaletteError, match="cannot read"):
         load_palette(tmp_path)
+
+
+def test_diff_backgrounds_are_palette_colors_with_ui_roles():
+    palette = load_palette()
+    expected = {
+        "diffAdded": "#152424", "diffRemoved": "#341123", "diffChanged": "#142240",
+        "diffAddedEmph": "#1D3528", "diffRemovedEmph": "#4C1828", "diffText": "#1D3252",
+    }
+    for name, hex_ in expected.items():
+        assert palette.colors[name] == hex_
+        assert palette.ui[name] == name
+
+
+def test_foreground_readable_on_diff_backgrounds():
+    from deepwick_spec.color import contrast_ratio
+
+    c = load_palette().colors
+    for name in ("diffAdded", "diffRemoved", "diffChanged", "diffAddedEmph", "diffRemovedEmph", "diffText"):
+        assert contrast_ratio(c["foreground"], c[name]) >= 7, name

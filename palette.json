@@ -21,7 +21,13 @@
     "sage": "#B5CEA8",
     "green": "#57A64A",
     "red": "#F44747",
-    "white": "#FFFFFF"
+    "white": "#FFFFFF",
+    "diffAdded": "#152424",
+    "diffRemoved": "#341123",
+    "diffChanged": "#142240",
+    "diffAddedEmph": "#1D3528",
+    "diffRemovedEmph": "#4C1828",
+    "diffText": "#1D3252"
   },
   "ansi": {
     "black": "#1B2140",
@@ -63,7 +69,13 @@
     "accent": "blue",
     "inactiveBorder": "overlay",
     "searchMatch": "selection",
-    "searchCurrent": "gold"
+    "searchCurrent": "gold",
+    "diffAdded": "diffAdded",
+    "diffRemoved": "diffRemoved",
+    "diffChanged": "diffChanged",
+    "diffAddedEmph": "diffAddedEmph",
+    "diffRemovedEmph": "diffRemovedEmph",
+    "diffText": "diffText"
   },
   "syntax": {
     "comment": { "color": "comment", "style": ["italic"] },
