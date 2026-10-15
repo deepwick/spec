@@ -102,12 +102,13 @@ def _read_config(path: Path) -> str:
 
 
 def _config_dir(root: Path) -> Path:
-    start = root if root.is_dir() else root.parent
-    for directory in (start, *start.parents):
+    """Nearest directory with a config file, searching up to the repo root (none above it, none without a repo)."""
+    start = (root if root.is_dir() else root.parent).absolute()
+    chain = [start, *start.parents]
+    top = next((i for i, d in enumerate(chain) if (d / ".git").exists()), None)
+    for directory in chain[: top + 1] if top is not None else [start]:
         if (directory / ALLOW_FILE).is_file() or (directory / IGNORE_FILE).is_file():
             return directory
-        if (directory / ".git").exists():
-            break
     return start
 
 
@@ -124,7 +125,7 @@ def _iter_files(root: Path, base: Path, patterns: list[str]) -> Iterator[Path]:
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
         for name in filenames:
             path = Path(dirpath) / name
-            if not path.is_file() or name in (ALLOW_FILE, IGNORE_FILE):
+            if not path.is_file() or name in (ALLOW_FILE, IGNORE_FILE) or name in SKIP_DIRS:
                 continue
             if is_ignored(PurePosixPath(path.relative_to(base).as_posix()), patterns):
                 continue
@@ -146,7 +147,8 @@ def scan(root: Path, allowed: frozenset[str]) -> tuple[list[Violation], int]:
 
     violations = []
     checked = 0
-    for path in _iter_files(root, config_dir, patterns):
+    abs_root = root.absolute()
+    for path in _iter_files(abs_root, config_dir, patterns):
         try:
             text = _read_text(path)
         except OSError as e:
@@ -155,7 +157,7 @@ def scan(root: Path, allowed: frozenset[str]) -> tuple[list[Violation], int]:
         if text is None:
             continue
         checked += 1
-        shown = path.relative_to(root).as_posix() if root.is_dir() else str(path)
+        shown = path.relative_to(abs_root).as_posix() if root.is_dir() else str(root)
         for line, col, raw in find_colors(text):
             if to_hex(raw) not in permitted:
                 violations.append(Violation(shown, line, col, raw))

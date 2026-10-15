@@ -106,3 +106,16 @@ def test_ignore_patterns_relative_to_config_dir(tmp_path):
     (tmp_path / "themes" / "vendor").mkdir(parents=True)
     (tmp_path / "themes" / "vendor" / "a.css").write_text("color: #ff0000;\n")
     assert scan(tmp_path / "themes", frozenset()) == ([], 0)
+
+
+def test_git_file_is_not_scanned(tmp_path):
+    (tmp_path / ".git").write_text("gitdir: /x/#ff0000\n")
+    assert scan(tmp_path, frozenset()) == ([], 0)
+
+
+def test_config_search_stops_without_a_repo(tmp_path):
+    (tmp_path / ".palette-allow").write_text("#ff0000\n")
+    project = tmp_path / "export" / "port"
+    project.mkdir(parents=True)
+    (project / "a.css").write_text("color: #ff0000;\n")
+    assert len(scan(project, frozenset())[0]) == 1

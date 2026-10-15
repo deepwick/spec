@@ -148,3 +148,13 @@ def test_unreadable_subdir_warns(tmp_path, capsys):
         assert "cannot read" in capsys.readouterr().err
     finally:
         locked.chmod(0o755)
+
+
+def test_ancestor_config_found_from_relative_default_path(tmp_path, monkeypatch, capsys):
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".palette-ignore").write_text("sub/deep/*\n")
+    deep = tmp_path / "sub" / "deep"
+    deep.mkdir(parents=True)
+    (deep / "bad.txt").write_text("#ff0000\n")
+    monkeypatch.chdir(deep)
+    assert main([]) == 0
