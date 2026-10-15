@@ -7,7 +7,7 @@ E = "\x1b["
 
 def test_truecolor_and_attributes():
     text = f"{E}3;38;2;122;134;168m# note{E}0m {E}1;48;2;38;79;120mx{E}0m"
-    assert style_of(text, "# note") == {"fg": "#7a86a8", "bg": None, "bold": False, "italic": True, "underline": False, "reverse": False}
+    assert style_of(text, "# note") == {"fg": "#7a86a8", "bg": None, "bold": False, "dim": False, "italic": True, "underline": False, "strike": False, "reverse": False}
     assert style_of(text, "x")["bg"] == "#264f78"
     assert style_of(text, "x")["bold"] is True
 
@@ -51,3 +51,11 @@ def test_plain_and_line_with():
 def test_missing_token_raises():
     with pytest.raises(AssertionError, match="nope"):
         style_of("abc", "nope")
+
+
+def test_dim_strike_and_colon_256():
+    text = f"{E}38:5:196mA{E}2;9mB{E}22;29mC"
+    assert style_of(text, "A")["fg"] == "ansi256:196"
+    b, c = style_of(text, "B"), style_of(text, "C")
+    assert (b["dim"], b["strike"]) == (True, True)
+    assert (c["dim"], c["strike"]) == (False, False)

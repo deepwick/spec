@@ -4,7 +4,7 @@ SGR = re.compile(r"\x1b\[([0-9;:]*)m")
 
 
 def _blank() -> dict:
-    return {"fg": None, "bg": None, "bold": False, "italic": False, "underline": False, "reverse": False}
+    return {"fg": None, "bg": None, "bold": False, "dim": False, "italic": False, "underline": False, "strike": False, "reverse": False}
 
 
 def _apply_group(style: dict, group: str) -> None:
@@ -13,6 +13,8 @@ def _apply_group(style: dict, group: str) -> None:
     if code in (38, 48) and len(sub) >= 5 and sub[1] == 2:
         r, g, b = sub[-3:]
         style["fg" if code == 38 else "bg"] = f"#{r:02x}{g:02x}{b:02x}"
+    elif code in (38, 48) and len(sub) >= 3 and sub[1] == 5:
+        style["fg" if code == 38 else "bg"] = f"ansi256:{sub[2]}"
     elif code == 4:
         style["underline"] = sub[1] != 0 if len(sub) > 1 else True
 
@@ -35,20 +37,27 @@ def runs(text: str) -> list[tuple[str, dict]]:
                 style = _blank()
             elif p == 1:
                 style["bold"] = True
+            elif p == 2:
+                style["dim"] = True
             elif p == 3:
                 style["italic"] = True
             elif p == 4:
                 style["underline"] = True
             elif p == 7:
                 style["reverse"] = True
+            elif p == 9:
+                style["strike"] = True
             elif p == 22:
                 style["bold"] = False
+                style["dim"] = False
             elif p == 23:
                 style["italic"] = False
             elif p == 24:
                 style["underline"] = False
             elif p == 27:
                 style["reverse"] = False
+            elif p == 29:
+                style["strike"] = False
             elif 30 <= p <= 37:
                 style["fg"] = f"ansi:{p - 30}"
             elif 40 <= p <= 47:

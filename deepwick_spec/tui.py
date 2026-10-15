@@ -61,10 +61,16 @@ def capture(
     env_args: list[str] = []
     for key, value in {"COLORTERM": "truecolor", **(env or {})}.items():
         env_args += ["-e", f"{key}={value}"]
-    socket_path = subprocess.run(
+    started = subprocess.run(
         [*base, "new-session", "-d", "-P", "-F", "#{socket_path}", "-x", str(size[0]), "-y", str(size[1]), *env_args, command],
-        check=True, capture_output=True, text=True,
-    ).stdout.strip()
+        capture_output=True, text=True,
+    )
+    if started.returncode != 0:
+        subprocess.run([*base, "kill-server"], capture_output=True)
+        default_dir = Path(os.environ.get("TMUX_TMPDIR", "/tmp")) / f"tmux-{os.getuid()}"
+        (default_dir / socket).unlink(missing_ok=True)
+        raise RuntimeError(f"tmux new-session failed: {started.stderr.strip()}")
+    socket_path = started.stdout.strip()
     try:
         text = _wait(base, wait_for, timeout, settle)
         if literal is None and not keys:
@@ -77,4 +83,5 @@ def capture(
     finally:
         subprocess.run([*base, "kill-server"], capture_output=True)
         # tmux never unlinks its socket on exit, and unique names mean nothing reuses it.
-        Path(socket_path).unlink(missing_ok=True)
+        if socket_path:
+            Path(socket_path).unlink(missing_ok=True)

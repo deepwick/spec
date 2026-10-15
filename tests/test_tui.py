@@ -59,3 +59,12 @@ def test_capture_removes_socket_file_when_app_exits_early():
     with pytest.raises(TimeoutError, match="exited"):
         capture("true", wait_for="never", timeout=10)
     assert _own_sockets() == before
+
+
+@pytest.mark.skipif(not tmux_available(), reason="requires tmux")
+def test_capture_reports_tmux_errors():
+    sockets = Path(os.environ.get("TMUX_TMPDIR", "/tmp")) / f"tmux-{os.getuid()}"
+    before = set(sockets.glob(f"deepwick-test-{os.getpid()}-*"))
+    with pytest.raises(RuntimeError, match="width too small|size"):
+        capture("true", size=(0, 0))
+    assert set(sockets.glob(f"deepwick-test-{os.getpid()}-*")) == before, "failed new-session left its socket"
