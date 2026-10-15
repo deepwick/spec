@@ -195,7 +195,8 @@ ones that apply in their README Notes, using these descriptions:
   distinction (no Mint), and `new` is Blue.
 - **GtkSourceView** (GNOME Text Editor, gedit, Builder, Meld): Python control
   flow is mostly Blue (version 4 gives every Python keyword one style; version 5
-  makes `return`/`raise` Magenta but keeps `if`/`for` Blue), and
+  makes `return`/`raise` Magenta but keeps `if`/`for` and the operator keywords
+  `and`/`or`/`not`/`is`/`in` Blue), and
   JavaScript/TypeScript keywords share one style; Python docstrings are strings;
   JavaScript/TypeScript function and type names are plain; a C preprocessor
   line is one style; no Mint; Markdown fenced code is plain Orange.
