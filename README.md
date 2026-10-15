@@ -200,6 +200,12 @@ ones that apply in their README Notes, using these descriptions:
   JavaScript/TypeScript keywords share one style; Python docstrings are strings;
   JavaScript/TypeScript function and type names are plain; a C preprocessor
   line is one style; no Mint; Markdown fenced code is plain Orange.
+- **Obsidian**: one keyword color and no control-flow token in either
+  grammar, so control flow is Blue. In reading view (Prism), booleans and
+  Python `None` share the number color (Sage) and Python `print` is a keyword
+  (Blue); Live Preview (CodeMirror legacy modes) colors Python class names like
+  functions (Yellow), calls like variables (Light Blue) and `None` like a
+  keyword (Blue).
 
 ## Rules for ports
 
