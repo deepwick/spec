@@ -187,6 +187,18 @@ ones that apply in their README Notes, using these descriptions:
 - **Terminal-rendered formats**: zsh `region_highlight` has no italic, so
   zsh-syntax-highlighting comments are not italic; bat draws italics only with
   `--italic-text=always`; Ptyxis has no selection color.
+- **KTextEditor** (Kate, KWrite, KDevelop): a C preprocessor line is one
+  token, so macro names are not Magenta and directive keywords are not bold
+  Foreground; C function, struct and macro-use names are plain. Python
+  definition names and constants are not distinguished, and a for-loop's `in`
+  shares the operator-keyword style. TypeScript has no interface/enum
+  distinction (no Mint), and `new` is Blue.
+- **GtkSourceView** (GNOME Text Editor, gedit, Builder, Meld): Python control
+  flow is mostly Blue (version 4 gives every Python keyword one style; version 5
+  makes `return`/`raise` Magenta but keeps `if`/`for` Blue), and
+  JavaScript/TypeScript keywords share one style; Python docstrings are strings;
+  JavaScript/TypeScript function and type names are plain; a C preprocessor
+  line is one style; no Mint; Markdown fenced code is plain Orange.
 
 ## Rules for ports
 
