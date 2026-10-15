@@ -205,7 +205,9 @@ ones that apply in their README Notes, using these descriptions:
   Python `None` share the number color (Sage) and Python `print` is a keyword
   (Blue); Live Preview (CodeMirror legacy modes) colors Python class names like
   functions (Yellow), calls like variables (Light Blue) and `None` like a
-  keyword (Blue).
+  keyword (Blue); its definition and meta tokens are Yellow (Python function
+  names, decorators), which also makes JavaScript/TypeScript variable
+  declarations and C preprocessor lines Yellow.
 
 ## Rules for ports
 
