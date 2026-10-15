@@ -80,3 +80,21 @@ def test_main_invalid_palette_exits_2(port, palette_data, write_palette, capsys)
     palette_data["colors"]["red"] = "#nothex"
     assert main([str(port), "--palette", str(write_palette(palette_data))]) == 2
     assert "invalid palette" in capsys.readouterr().err
+
+
+from deepwick_spec.check_port import _check_workflow, _flatten
+
+
+def test_flatten_handles_bare_quote_lines():
+    assert _flatten("> a\n>\n> b") == "a b"
+
+
+def test_spec_ref_must_match_workflow_ref(tmp_path):
+    wf = tmp_path / ".github" / "workflows"
+    wf.mkdir(parents=True)
+    (wf / "check.yml").write_text(
+        "jobs:\n  port:\n    uses: deepwick/spec/.github/workflows/check.yml@v1\n    with:\n      spec-ref: main\n"
+    )
+    assert any("spec-ref" in p for p in _check_workflow(tmp_path))
+    (wf / "check.yml").write_text("jobs:\n  port:\n    uses: deepwick/spec/.github/workflows/check.yml@main\n")
+    assert _check_workflow(tmp_path) == []

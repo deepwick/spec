@@ -15,7 +15,7 @@ _TESTED = re.compile(r"Tested with \S.* \d+(\.\d+)*")
 
 
 def _flatten(markdown: str) -> str:
-    return " ".join(markdown.replace("> ", " ").split())
+    return " ".join(re.sub(r"(?m)^[ \t]*>+[ \t]?", "", markdown).split())
 
 
 def _check_readme(root: Path) -> list[str]:
@@ -41,12 +41,25 @@ def _check_license(root: Path) -> list[str]:
     return []
 
 
+_SPEC_REF = re.compile(r"^\s*spec-ref:\s*['\"]?([^'\"\s#]+)", re.M)
+
+
 def _check_workflow(root: Path) -> list[str]:
     path = root / ".github" / "workflows" / "check.yml"
     if not path.is_file():
         return [".github/workflows/check.yml is missing"]
-    if WORKFLOW_REF not in path.read_text(encoding="utf-8", errors="replace"):
+    text = path.read_text(encoding="utf-8", errors="replace")
+    called = re.search(re.escape(WORKFLOW_REF) + r"([^\s'\"#]+)", text)
+    if not called:
         return [f".github/workflows/check.yml does not call the reusable workflow {WORKFLOW_REF}main"]
+    ref = called.group(1)
+    spec_ref = _SPEC_REF.search(text)
+    installed = spec_ref.group(1) if spec_ref else "main"
+    if installed != ref:
+        return [
+            f".github/workflows/check.yml calls the workflow @{ref} but installs deepwick-spec @{installed}; "
+            f"set spec-ref: {ref}"
+        ]
     return []
 
 

@@ -1,4 +1,4 @@
-name: check-palette
+name: check-port
 on:
   workflow_call:
     inputs:
@@ -7,7 +7,7 @@ on:
         type: string
         default: main
 jobs:
-  check-palette:
+  check-port:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -15,8 +15,8 @@ CREDIT = (
 
 
 def test_readme_has_credit_line():
-    text = (REPO / "README.md").read_text(encoding="utf-8").replace("> ", " ")
-    assert CREDIT in " ".join(text.split())
+    from deepwick_spec.check_port import _flatten
+    assert CREDIT in _flatten((REPO / "README.md").read_text(encoding="utf-8"))
 
 
 def test_readme_lists_every_palette_color():
@@ -48,6 +48,8 @@ def test_check_workflow_is_reusable_and_runs_check_port():
     text = (REPO / ".github" / "workflows" / "check.yml").read_text(encoding="utf-8")
     assert "workflow_call" in text
     assert "check-port ." in text
+    assert re.search(r"^name: check-port$", text, re.M)
+    assert re.search(r"^jobs:\n  check-port:$", text, re.M)
 
 
 SPEC_SCOPES = [

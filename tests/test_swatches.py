@@ -53,3 +53,9 @@ def test_main_invalid_palette_exits_2(tmp_path, palette_data, write_palette, cap
     palette_data["colors"]["red"] = "#nothex"
     assert main(["-o", str(tmp_path / "s.svg"), "--palette", str(write_palette(palette_data))]) == 2
     assert "invalid palette" in capsys.readouterr().err
+
+
+def test_committed_swatches_match_palette():
+    from pathlib import Path
+    svg = Path(__file__).resolve().parents[1] / "swatches.svg"
+    assert svg.read_text(encoding="utf-8") == render_svg(load_palette())
