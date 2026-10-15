@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import time
+from pathlib import Path
 
 from deepwick_spec.ansi import plain
 
@@ -60,7 +61,10 @@ def capture(
     env_args: list[str] = []
     for key, value in {"COLORTERM": "truecolor", **(env or {})}.items():
         env_args += ["-e", f"{key}={value}"]
-    subprocess.run([*base, "new-session", "-d", "-x", str(size[0]), "-y", str(size[1]), *env_args, command], check=True)
+    socket_path = subprocess.run(
+        [*base, "new-session", "-d", "-P", "-F", "#{socket_path}", "-x", str(size[0]), "-y", str(size[1]), *env_args, command],
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
     try:
         text = _wait(base, wait_for, timeout, settle)
         if literal is None and not keys:
@@ -72,3 +76,5 @@ def capture(
         return _wait(base, after, timeout, settle, changed_from=None if after else text)
     finally:
         subprocess.run([*base, "kill-server"], capture_output=True)
+        # tmux never unlinks its socket on exit, and unique names mean nothing reuses it.
+        Path(socket_path).unlink(missing_ok=True)

@@ -95,7 +95,7 @@
     "tag": { "color": "blue" },
     "tagBracket": { "color": "muted" },
     "preprocessor": { "color": "muted", "style": ["bold"] },
-    "preprocessorKeyword": { "color": "foreground" },
+    "preprocessorKeyword": { "color": "foreground", "style": ["bold"] },
     "label": { "color": "foreground" },
     "heading": { "color": "blue", "style": ["bold"] },
     "bold": { "color": null, "style": ["bold"] },

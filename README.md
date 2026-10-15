@@ -108,7 +108,7 @@ will paint comment markers and string quotes Foreground.
 | type | `entity.name.type`, `entity.name.class`, `entity.name.namespace`, `entity.name.scope-resolution`, `support.class`, `support.type` | `namespace`, `type`, `class` | Teal |  |
 | interface / enum / struct | `entity.name.type.interface`, `entity.name.type.enum`, `entity.name.type.enum-member`, `entity.name.type.struct`, `storage.type.struct` | `interface`, `enum`, `struct`, `typeParameter` | Mint |  |
 | function | `entity.name.function`, `entity.name.function.member`, `support.function`, `meta.function-call`, `support.function.magic`, `entity.name.function.decorator` | `function`, `method` | Yellow |  |
-| macro | `entity.name.function.macro` | `macro` | Magenta |  |
+| macro | `entity.name.function.macro`, `entity.name.function.preprocessor`, `entity.name.constant.preprocessor` | `macro` | Magenta |  |
 | variable | `variable`, `entity.name.variable`, `variable.parameter`, `variable.other.property`, `variable.other.object.property`, `entity.other.attribute-name`, `support.type.property-name` (CSS, JSON) | `variable`, `parameter`, `property` | Light Blue |  |
 | constant | `variable.other.constant` | `*.readonly`, `enumMember` | Cyan |  |
 | string | `string`, `punctuation.definition.string`, `string.quoted.include`, `string.quoted.other.lt-gt.include`, `punctuation.definition.string.begin.include`, `punctuation.definition.string.end.include`, `support.constant.property-value` (CSS) | `string` | Orange |  |
@@ -117,8 +117,8 @@ will paint comment markers and string quotes Foreground.
 | number | `constant.numeric` | `number` | Sage |  |
 | tag | `entity.name.tag` | — | Blue |  |
 | tag bracket | `punctuation.definition.tag` | — | Muted |  |
-| preprocessor | `meta.preprocessor`, `entity.name.function.preprocessor` | — | Muted | bold |
-| preprocessor keyword | `keyword.control.directive`, `keyword.preprocessor` | — | Foreground |  |
+| preprocessor | `meta.preprocessor` | — | Muted | bold |
+| preprocessor keyword | `keyword.control.directive`, `keyword.preprocessor` | — | Foreground | bold |
 | label | `entity.name.label` | `label` | Foreground |  |
 | heading | `markup.heading`, `entity.name.section.markdown` | — | Blue | bold |
 | bold / italic | `markup.bold` / `markup.italic` | — | inherit | bold / italic |
@@ -171,15 +171,18 @@ ones that apply in their README Notes, using these descriptions:
 - **Tree-sitter without semantic tokens** (Neovim without LSP, Helix, Zed): no
   capture distinguishes interfaces, enums, and structs from other types, so the
   Mint role appears only where a language server supplies semantic tokens.
-  Macro definitions are captured as macros (Magenta) rather than preprocessor
-  (Muted bold).
+  Function-like macro definitions are Magenta. Neovim also captures object-like
+  macro names (`#define MAX 3`) as macros, but Helix and Zed give them only the
+  generic all-caps constant capture, so they are Cyan there.
 - **Tree-sitter without per-language overrides** (Helix): Python's `and`,
-  `or`, `not`, `is` share the capture used for `typeof`/`new`, so they take the
-  control-flow color; Python builtin types take the keyword color.
+  `or`, `not`, `is` and membership `in` share the capture used for
+  `typeof`/`new`, so they take the control-flow color; Python builtin types take
+  the keyword color.
 - **Zed's Python grammar** captures control-flow keywords (`if`, `for`,
-  `return`, `import`, …) and `and`/`or`/`not`/`is` as plain keywords, so they
+  `return`, `import`, …) and `and`/`or`/`not`/`is`/`in` (including a for-loop's
+  `in`) as plain keywords, so they
   take the keyword color (Blue); builtin types take the type color (Teal).
-- **TextMate grammars** (bat): no scope marks macro uses or C/C++ builtin types
+- **TextMate grammars** (bat): no scope marks macro uses (only definitions) or C/C++ builtin types
   separately from other identifiers and keywords.
 - **Terminal-rendered formats**: zsh `region_highlight` has no italic, so
   zsh-syntax-highlighting comments are not italic; bat draws italics only with
