@@ -8,11 +8,11 @@ def normalize_hex(value: str) -> str:
     if not match:
         raise ValueError(f"not a hex color: {value!r}")
     prefix, digits = match.group(1), match.group(2).lower()
-    allowed_lengths = {3, 6, 8} if prefix == "#" else {6}
+    allowed_lengths = {3, 4, 6, 8} if prefix == "#" else {6, 8}
     if len(digits) not in allowed_lengths:
         raise ValueError(f"not a hex color: {value!r}")
-    if len(digits) == 3:
-        digits = "".join(c * 2 for c in digits)
+    if len(digits) in (3, 4):
+        digits = "".join(c * 2 for c in digits[:3])
     return "#" + digits[:6]
 
 

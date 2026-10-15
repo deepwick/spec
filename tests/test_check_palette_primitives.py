@@ -26,7 +26,7 @@ def test_reports_line_and_column():
     "text",
     [
         "&#123;",          # HTML entity
-        "#abcd",           # 4 digits is not a supported form
+        "#1234",           # all-digit 4-digit match is an issue ref, not a color
         "#12345",          # 5 digits
         "#1234567",        # 7 digits
         "#123456789",      # 9 digits
@@ -66,3 +66,43 @@ def test_ignore_file_parsing():
 )
 def test_is_ignored(path, patterns, expected):
     assert is_ignored(PurePosixPath(path), patterns) is expected
+
+
+from deepwick_spec.check_palette import find_colors, scan
+
+
+def test_finds_alpha_forms():
+    hits = list(find_colors("a #f00a b 0xff0000aa"))
+    assert [(c, raw) for _, c, raw in hits] == [(3, "#f00a"), (11, "0xff0000aa")]
+
+
+def test_skips_issue_refs_and_markdown_anchors():
+    assert list(find_colors("see #1234 and [x](#dead)")) == []
+
+
+def test_line_numbers_ignore_form_feeds():
+    assert [line for line, _, _ in find_colors("a\x0cb\x1cc d\nc #ff0000\n")] == [2]
+
+
+def test_skips_vendored_dirs(tmp_path):
+    for d in (".venv/lib", "node_modules/x", ".git"):
+        (tmp_path / d).mkdir(parents=True)
+        (tmp_path / d / "a.css").write_text("color: #ff0000;\n")
+    assert scan(tmp_path, frozenset()) == ([], 0)
+
+
+def test_config_found_in_ancestor(tmp_path):
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".palette-allow").write_text("#ff0000\n")
+    (tmp_path / "themes").mkdir()
+    (tmp_path / "themes" / "a.css").write_text("color: #ff0000;\n")
+    assert scan(tmp_path / "themes" / "a.css", frozenset())[0] == []
+    assert scan(tmp_path / "themes", frozenset())[0] == []
+
+
+def test_ignore_patterns_relative_to_config_dir(tmp_path):
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".palette-ignore").write_text("themes/vendor\n")
+    (tmp_path / "themes" / "vendor").mkdir(parents=True)
+    (tmp_path / "themes" / "vendor" / "a.css").write_text("color: #ff0000;\n")
+    assert scan(tmp_path / "themes", frozenset()) == ([], 0)

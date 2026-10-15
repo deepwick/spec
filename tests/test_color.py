@@ -19,7 +19,7 @@ def test_normalize_hex_accepts_supported_forms(raw, expected):
     assert normalize_hex(raw) == expected
 
 
-@pytest.mark.parametrize("raw", ["", "#", "#12", "#1234", "#12345", "#1234567", "#ggg", "0xfff", "0x7A86A8CC", "569CD6"])
+@pytest.mark.parametrize("raw", ["", "#", "#12", "#12345", "#1234567", "#ggg", "0xfff", "569CD6"])
 def test_normalize_hex_rejects_other_input(raw):
     with pytest.raises(ValueError):
         normalize_hex(raw)
@@ -44,3 +44,9 @@ def test_contrast_ratio_is_symmetric():
 )
 def test_contrast_ratio_matches_spec_table(color, expected):
     assert round(contrast_ratio(color, "#04041a"), 2) == expected
+
+
+def test_normalize_hex_accepts_alpha_forms():
+    from deepwick_spec.color import normalize_hex
+    assert normalize_hex("#f00a") == "#ff0000"
+    assert normalize_hex("0xff0000aa") == "#ff0000"

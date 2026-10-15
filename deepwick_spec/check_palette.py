@@ -1,4 +1,5 @@
 import argparse
+import os
 import re
 import sys
 from collections.abc import Iterator
@@ -12,10 +13,17 @@ from deepwick_spec.palette import PaletteError, load_palette
 ALLOW_FILE = ".palette-allow"
 IGNORE_FILE = ".palette-ignore"
 
+SKIP_DIRS = frozenset({".git", ".venv", "node_modules"})
+
 _COLOR = re.compile(
-    r"(?<![\w&#])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9A-Za-z_])"
-    r"|(?<!\w)0[xX][0-9a-fA-F]{6}(?![0-9A-Za-z_])"
+    r"(?<![\w&#])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![0-9A-Za-z_])"
+    r"|(?<!\w)0[xX](?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6})(?![0-9A-Za-z_])"
 )
+
+
+def _skip(line: str, start: int, raw: str) -> bool:
+    """4-digit #matches that are issue refs (#1234) or Markdown anchors (](#dead))."""
+    return raw.startswith("#") and len(raw) == 5 and (raw[1:].isdigit() or line[max(0, start - 2) : start] == "](")
 
 
 _RGB_FUNC = re.compile(
@@ -40,8 +48,8 @@ def to_hex(raw: str) -> str:
 
 
 def find_colors(text: str) -> Iterator[tuple[int, int, str]]:
-    for lineno, line in enumerate(text.splitlines(), start=1):
-        hits = [(m.start(), m.group(0)) for m in _COLOR.finditer(line)]
+    for lineno, line in enumerate(text.split("\n"), start=1):
+        hits = [(m.start(), m.group(0)) for m in _COLOR.finditer(line) if not _skip(line, m.start(), m.group(0))]
         hits += [(m.start(), m.group(0)) for m in _RGB_FUNC.finditer(line) if _in_range(*m.groups())]
         value = _RGB_VALUE.match(line)
         if value and _in_range(*value.groups()[1:]):
@@ -93,19 +101,35 @@ def _read_config(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace") if path.is_file() else ""
 
 
-def _iter_files(root: Path, patterns: list[str]) -> Iterator[Path]:
+def _config_dir(root: Path) -> Path:
+    start = root if root.is_dir() else root.parent
+    for directory in (start, *start.parents):
+        if (directory / ALLOW_FILE).is_file() or (directory / IGNORE_FILE).is_file():
+            return directory
+        if (directory / ".git").exists():
+            break
+    return start
+
+
+def _warn_unreadable(error: OSError) -> None:
+    print(f"check-palette: warning: cannot read {error.filename}: {error.strerror}", file=sys.stderr)
+
+
+def _iter_files(root: Path, base: Path, patterns: list[str]) -> Iterator[Path]:
     if root.is_file():
         yield root
         return
-    for path in sorted(root.rglob("*")):
-        if not path.is_file():
-            continue
-        rel = PurePosixPath(path.relative_to(root).as_posix())
-        if ".git" in rel.parts or rel.name in (ALLOW_FILE, IGNORE_FILE):
-            continue
-        if is_ignored(rel, patterns):
-            continue
-        yield path
+    found = []
+    for dirpath, dirnames, filenames in os.walk(root, onerror=_warn_unreadable):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        for name in filenames:
+            path = Path(dirpath) / name
+            if not path.is_file() or name in (ALLOW_FILE, IGNORE_FILE):
+                continue
+            if is_ignored(PurePosixPath(path.relative_to(base).as_posix()), patterns):
+                continue
+            found.append(path)
+    yield from sorted(found)
 
 
 def _read_text(path: Path) -> str | None:
@@ -116,13 +140,13 @@ def _read_text(path: Path) -> str | None:
 
 
 def scan(root: Path, allowed: frozenset[str]) -> tuple[list[Violation], int]:
-    config_dir = root if root.is_dir() else root.parent
+    config_dir = _config_dir(root)
     permitted = allowed | parse_allow_file(_read_config(config_dir / ALLOW_FILE))
     patterns = parse_ignore_file(_read_config(config_dir / IGNORE_FILE))
 
     violations = []
     checked = 0
-    for path in _iter_files(root, patterns):
+    for path in _iter_files(root, config_dir, patterns):
         try:
             text = _read_text(path)
         except OSError as e:
@@ -149,6 +173,12 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.path.exists():
         print(f"check-palette: no such file or directory: {args.path}", file=sys.stderr)
+        return 2
+    if not (args.path.is_file() or args.path.is_dir()):
+        print(f"check-palette: not a regular file or directory: {args.path}", file=sys.stderr)
+        return 2
+    if not os.access(args.path, os.R_OK | (os.X_OK if args.path.is_dir() else 0)):
+        print(f"check-palette: cannot read {args.path}", file=sys.stderr)
         return 2
     try:
         palette = load_palette(args.palette)

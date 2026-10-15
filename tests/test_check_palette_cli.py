@@ -112,3 +112,39 @@ def test_default_path_is_cwd(port, monkeypatch):
     (port / "theme.conf").write_text("#123456\n")
     monkeypatch.chdir(port)
     assert main([]) == 1
+
+
+
+
+
+
+def test_fifo_path_is_an_error(tmp_path, capsys):
+    fifo = tmp_path / "pipe"
+    os.mkfifo(fifo)
+    assert main([str(fifo)]) == 2
+    assert "not a regular file or directory" in capsys.readouterr().err
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root can read anything")
+def test_unreadable_dir_is_an_error(tmp_path, capsys):
+    locked = tmp_path / "locked"
+    locked.mkdir()
+    locked.chmod(0)
+    try:
+        assert main([str(locked)]) == 2
+        assert "cannot read" in capsys.readouterr().err
+    finally:
+        locked.chmod(0o755)
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root can read anything")
+def test_unreadable_subdir_warns(tmp_path, capsys):
+    (tmp_path / "ok.css").write_text("a {}\n")
+    locked = tmp_path / "locked"
+    locked.mkdir()
+    locked.chmod(0)
+    try:
+        assert main([str(tmp_path)]) == 0
+        assert "cannot read" in capsys.readouterr().err
+    finally:
+        locked.chmod(0o755)
