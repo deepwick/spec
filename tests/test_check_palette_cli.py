@@ -114,10 +114,6 @@ def test_default_path_is_cwd(port, monkeypatch):
     assert main([]) == 1
 
 
-
-
-
-
 def test_fifo_path_is_an_error(tmp_path, capsys):
     fifo = tmp_path / "pipe"
     os.mkfifo(fifo)

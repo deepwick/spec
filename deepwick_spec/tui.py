@@ -67,7 +67,7 @@ def capture(
     )
     if started.returncode != 0:
         subprocess.run([*base, "kill-server"], capture_output=True)
-        default_dir = Path(os.environ.get("TMUX_TMPDIR", "/tmp")) / f"tmux-{os.getuid()}"
+        default_dir = Path(os.environ.get("TMUX_TMPDIR") or "/tmp") / f"tmux-{os.getuid()}"
         (default_dir / socket).unlink(missing_ok=True)
         raise RuntimeError(f"tmux new-session failed: {started.stderr.strip()}")
     socket_path = started.stdout.strip()

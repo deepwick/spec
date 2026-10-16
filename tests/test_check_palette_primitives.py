@@ -2,7 +2,7 @@ from pathlib import PurePosixPath
 
 import pytest
 
-from deepwick_spec.check_palette import find_colors, is_ignored, parse_allow_file, parse_ignore_file
+from deepwick_spec.check_palette import find_colors, is_ignored, parse_allow_file, parse_ignore_file, scan
 
 
 def raws(text):
@@ -66,9 +66,6 @@ def test_ignore_file_parsing():
 )
 def test_is_ignored(path, patterns, expected):
     assert is_ignored(PurePosixPath(path), patterns) is expected
-
-
-from deepwick_spec.check_palette import find_colors, scan
 
 
 def test_finds_alpha_forms():

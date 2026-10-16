@@ -62,8 +62,13 @@ def test_capture_removes_socket_file_when_app_exits_early():
 
 
 @pytest.mark.skipif(not tmux_available(), reason="requires tmux")
-def test_capture_reports_tmux_errors():
-    sockets = Path(os.environ.get("TMUX_TMPDIR", "/tmp")) / f"tmux-{os.getuid()}"
+@pytest.mark.parametrize("tmpdir", [None, ""])
+def test_capture_reports_tmux_errors(tmpdir, monkeypatch):
+    if tmpdir is None:
+        monkeypatch.delenv("TMUX_TMPDIR", raising=False)
+    else:
+        monkeypatch.setenv("TMUX_TMPDIR", tmpdir)
+    sockets = Path("/tmp") / f"tmux-{os.getuid()}"
     before = set(sockets.glob(f"deepwick-test-{os.getpid()}-*"))
     with pytest.raises(RuntimeError, match="width too small|size"):
         capture("true", size=(0, 0))
