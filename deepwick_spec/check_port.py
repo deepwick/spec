@@ -41,7 +41,31 @@ def _check_license(root: Path) -> list[str]:
     return []
 
 
-_SPEC_REF = re.compile(r"^\s*spec-ref:\s*['\"]?([^'\"\s#]+)", re.M)
+_COMMENT = re.compile(r"(?:^|\s)#.*$")
+_USES = re.compile(r"(?:^|[{,\s])uses\s*:\s*['\"]?" + re.escape(WORKFLOW_REF) + r"([^\s'\",}]+)", re.M)
+_SPEC_REF = re.compile(r"(?:^|[{,\s])spec-ref\s*:[ \t]*(?:(['\"])(.*?)\1|([^\s,}]*))", re.M)
+
+
+def _job_blocks(text: str) -> list[str]:
+    """The body of each job under the top-level `jobs:` key, comments stripped."""
+    blocks: list[list[str]] = []
+    in_jobs, job_indent = False, None
+    for raw in text.splitlines():
+        line = _COMMENT.sub("", raw).rstrip()
+        if not line.strip():
+            continue
+        indent = len(line) - len(line.lstrip())
+        if indent == 0:
+            in_jobs, job_indent = line.startswith("jobs:"), None
+            continue
+        if not in_jobs:
+            continue
+        if job_indent is None or indent <= job_indent:
+            job_indent = indent
+            blocks.append([])
+        else:
+            blocks[-1].append(line.strip())
+    return ["\n".join(block) for block in blocks]
 
 
 def _check_workflow(root: Path) -> list[str]:
@@ -49,18 +73,25 @@ def _check_workflow(root: Path) -> list[str]:
     if not path.is_file():
         return [".github/workflows/check.yml is missing"]
     text = path.read_text(encoding="utf-8", errors="replace")
-    called = re.search(re.escape(WORKFLOW_REF) + r"([^\s'\"#]+)", text)
-    if not called:
+    callers = [(m.group(1), block) for block in _job_blocks(text) if (m := _USES.search(block))]
+    if not callers:
         return [f".github/workflows/check.yml does not call the reusable workflow {WORKFLOW_REF}main"]
-    ref = called.group(1)
-    spec_ref = _SPEC_REF.search(text)
-    installed = spec_ref.group(1) if spec_ref else "main"
-    if installed != ref:
-        return [
-            f".github/workflows/check.yml calls the workflow @{ref} but installs deepwick-spec @{installed}; "
-            f"set spec-ref: {ref}"
-        ]
-    return []
+    problems = []
+    for ref, block in callers:
+        found = _SPEC_REF.search(block)
+        installed = "main" if found is None else (found.group(2) if found.group(1) else found.group(3))
+        if "${{" in installed:
+            problems.append(
+                f".github/workflows/check.yml: spec-ref must be a literal git ref, not an expression; set spec-ref: {ref}"
+            )
+        elif not installed:
+            problems.append(f".github/workflows/check.yml: spec-ref is empty; set spec-ref: {ref} or remove it")
+        elif installed != ref:
+            problems.append(
+                f".github/workflows/check.yml calls the workflow @{ref} but installs deepwick-spec @{installed}; "
+                f"set spec-ref: {ref}"
+            )
+    return problems
 
 
 def _check_screenshot(root: Path) -> list[str]:

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from deepwick_spec.check_port import CREDIT, check_port, main
+from deepwick_spec.check_port import CREDIT, _check_workflow, _flatten, check_port, main
 from deepwick_spec.palette import load_palette
 
 REPO = Path(__file__).resolve().parents[1]
@@ -82,9 +82,6 @@ def test_main_invalid_palette_exits_2(port, palette_data, write_palette, capsys)
     assert "invalid palette" in capsys.readouterr().err
 
 
-from deepwick_spec.check_port import _check_workflow, _flatten
-
-
 def test_flatten_handles_bare_quote_lines():
     assert _flatten("> a\n>\n> b") == "a b"
 
@@ -98,3 +95,47 @@ def test_spec_ref_must_match_workflow_ref(tmp_path):
     assert any("spec-ref" in p for p in _check_workflow(tmp_path))
     (wf / "check.yml").write_text("jobs:\n  port:\n    uses: deepwick/spec/.github/workflows/check.yml@main\n")
     assert _check_workflow(tmp_path) == []
+
+
+CALL = "deepwick/spec/.github/workflows/check.yml@"
+
+
+def workflow(tmp_path, text):
+    wf = tmp_path / ".github" / "workflows"
+    wf.mkdir(parents=True, exist_ok=True)
+    (wf / "check.yml").write_text(text)
+    return _check_workflow(tmp_path)
+
+
+def test_workflow_ignores_commented_uses(tmp_path):
+    text = f"jobs:\n  port:\n    # uses: {CALL}v9\n    uses: {CALL}main  # pinned later\n"
+    assert workflow(tmp_path, text) == []
+
+
+def test_workflow_comment_only_call_is_missing(tmp_path):
+    assert any("does not call" in p for p in workflow(tmp_path, f"jobs:\n  port:\n    # uses: {CALL}main\n"))
+
+
+def test_workflow_checks_every_calling_job(tmp_path):
+    text = (
+        f"jobs:\n  a:\n    uses: {CALL}main\n"
+        f"  b:\n    uses: {CALL}v1\n    with:\n      spec-ref: main\n"
+    )
+    problems = workflow(tmp_path, text)
+    assert len(problems) == 1 and "@v1" in problems[0]
+
+
+def test_workflow_flow_style_spec_ref(tmp_path):
+    assert workflow(tmp_path, f"jobs:\n  port:\n    uses: {CALL}v1\n    with: {{ spec-ref: v1 }}\n") == []
+    assert workflow(tmp_path, f"jobs:\n  port:\n    uses: {CALL}v1\n    with: {{spec-ref: 'main'}}\n") != []
+
+
+def test_workflow_empty_spec_ref(tmp_path):
+    problems = workflow(tmp_path, f"jobs:\n  port:\n    uses: {CALL}main\n    with:\n      spec-ref:\n")
+    assert any("empty" in p for p in problems)
+    assert any("empty" in p for p in workflow(tmp_path, f'jobs:\n  port:\n    uses: {CALL}main\n    with:\n      spec-ref: ""\n'))
+
+
+def test_workflow_expression_spec_ref(tmp_path):
+    text = f"jobs:\n  port:\n    uses: {CALL}main\n    with:\n      spec-ref: ${{{{ github.ref_name }}}}\n"
+    assert any("expression" in p for p in workflow(tmp_path, text))
