@@ -1,7 +1,9 @@
+import http.client
 import http.server
 import json
 import socket
 import threading
+import urllib.request
 
 import pytest
 
@@ -240,3 +242,25 @@ def test_connect_finds_the_page_and_evaluates(json_endpoint):
     port = json_endpoint([{"type": "page", "webSocketDebuggerUrl": server.url}])
     with connect(port, timeout=5) as session:
         assert session.evaluate("6 * 7") == 42
+
+
+def test_call_timeout_names_the_method():
+    server = FakeDevTools(lambda req: [])
+    session = CDPSession(server.url, timeout=0.5)
+    with pytest.raises(CDPError, match=r"Runtime.evaluate: no reply within 0.5s"):
+        session.evaluate("1")
+    session.close()
+
+
+def test_wait_for_page_retries_on_bad_http(monkeypatch):
+    calls = []
+
+    class Opener:
+        def open(self, url, timeout):
+            calls.append(url)
+            raise http.client.BadStatusLine("garbage")
+
+    monkeypatch.setattr(urllib.request, "build_opener", lambda *a: Opener())
+    with pytest.raises(TimeoutError, match="garbage|BadStatusLine"):
+        wait_for_page(1, timeout=0.6)
+    assert len(calls) >= 2

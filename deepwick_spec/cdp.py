@@ -2,6 +2,7 @@
 
 import base64
 import hashlib
+import http.client
 import json
 import os
 import socket
@@ -139,8 +140,8 @@ def wait_for_page(port: int, timeout: float = 60.0, host: str = "127.0.0.1") -> 
                     if target.get("type") == "page" and target.get("webSocketDebuggerUrl"):
                         return target["webSocketDebuggerUrl"]
             last = "no page target yet"
-        except (OSError, ValueError) as e:
-            last = str(e)
+        except (OSError, ValueError, http.client.HTTPException) as e:
+            last = str(e) or type(e).__name__
         if time.monotonic() >= deadline:
             raise TimeoutError(f"no CDP page target on port {port} after {timeout}s ({last})")
         time.sleep(0.25)
@@ -149,18 +150,22 @@ def wait_for_page(port: int, timeout: float = 60.0, host: str = "127.0.0.1") -> 
 class CDPSession:
     def __init__(self, ws_url: str, timeout: float = 60.0):
         self._ws = WebSocket(ws_url, timeout)
+        self._timeout = timeout
         self._id = 0
 
     def call(self, method: str, **params) -> dict:
         self._id += 1
-        self._ws.send(json.dumps({"id": self._id, "method": method, "params": params}))
-        while True:
-            message = json.loads(self._ws.recv())
-            if message.get("id") != self._id:
-                continue
-            if "error" in message:
-                raise CDPError(f"{method}: {message['error'].get('message', message['error'])}")
-            return message.get("result", {})
+        try:
+            self._ws.send(json.dumps({"id": self._id, "method": method, "params": params}))
+            while True:
+                message = json.loads(self._ws.recv())
+                if message.get("id") != self._id:
+                    continue
+                if "error" in message:
+                    raise CDPError(f"{method}: {message['error'].get('message', message['error'])}")
+                return message.get("result", {})
+        except TimeoutError:
+            raise CDPError(f"{method}: no reply within {self._timeout}s") from None
 
     def evaluate(self, expression: str):
         result = self.call("Runtime.evaluate", expression=expression, returnByValue=True, awaitPromise=True)
