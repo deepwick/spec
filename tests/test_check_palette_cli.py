@@ -158,3 +158,20 @@ def test_ancestor_config_found_from_relative_default_path(tmp_path, monkeypatch,
     (deep / "bad.txt").write_text("#ff0000\n")
     monkeypatch.chdir(deep)
     assert main([]) == 0
+
+
+def test_explicit_ignored_file_is_skipped(port, capsys):
+    (port / ".git").mkdir()
+    (port / ".palette-ignore").write_text("vendor/\n")
+    (port / "vendor").mkdir()
+    (port / "vendor" / "lib.css").write_text("a { color: #123456 }\n")
+    assert main([str(port / "vendor" / "lib.css")]) == 0
+    assert "0 violation(s) in 0 file(s)" in capsys.readouterr().err
+
+
+def test_explicit_file_not_matching_ignore_is_checked(port, capsys):
+    (port / ".git").mkdir()
+    (port / ".palette-ignore").write_text("vendor/\n")
+    (port / "theme.css").write_text("a { color: #123456 }\n")
+    assert main([str(port / "theme.css")]) == 1
+    assert "#123456" in capsys.readouterr().out

@@ -118,7 +118,8 @@ def _warn_unreadable(error: OSError) -> None:
 
 def _iter_files(root: Path, base: Path, patterns: list[str]) -> Iterator[Path]:
     if root.is_file():
-        yield root
+        if not is_ignored(PurePosixPath(root.relative_to(base).as_posix()), patterns):
+            yield root
         return
     found = []
     for dirpath, dirnames, filenames in os.walk(root, onerror=_warn_unreadable):
