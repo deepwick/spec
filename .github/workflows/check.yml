@@ -16,3 +16,9 @@ jobs:
           python-version: "3.12"
       - run: pip install "deepwick-spec @ git+https://github.com/deepwick/spec@${{ inputs.spec-ref }}"
       - run: check-port .
+      - name: port tests
+        run: |
+          if [ ! -d tests ]; then echo "no tests/ directory"; exit 0; fi
+          pip install pytest
+          if [ -f tests/requirements.txt ]; then pip install -r tests/requirements.txt; fi
+          python -m pytest -q -p no:cacheprovider

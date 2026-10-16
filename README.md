@@ -260,13 +260,15 @@ files at the root of a port tune it:
   Comments start with `# ` (hash, space): `#000000  # pure black required by the format`
 - `.palette-ignore` — glob patterns of paths to skip, e.g. `vendor/`
 
-Port CI is a single job:
+Port CI is a single job. It runs `check-port`, then the port's `tests/` with
+pytest (plus `tests/requirements.txt` if present). Tests that need an app the
+runner lacks skip themselves:
 
 ```yaml
 name: check
 on: [push, pull_request]
 jobs:
-  palette:
+  port:
     uses: deepwick/spec/.github/workflows/check.yml@main
 ```
 
