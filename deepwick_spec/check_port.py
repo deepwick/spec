@@ -62,7 +62,8 @@ def _job_blocks(text: str) -> list[str]:
             continue
         if job_indent is None or indent <= job_indent:
             job_indent = indent
-            blocks.append([])
+            inline = line.strip().partition(":")[2].strip()
+            blocks.append([inline] if inline else [])
         else:
             blocks[-1].append(line.strip())
     return ["\n".join(block) for block in blocks]

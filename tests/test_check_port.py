@@ -139,3 +139,12 @@ def test_workflow_empty_spec_ref(tmp_path):
 def test_workflow_expression_spec_ref(tmp_path):
     text = f"jobs:\n  port:\n    uses: {CALL}main\n    with:\n      spec-ref: ${{{{ github.ref_name }}}}\n"
     assert any("expression" in p for p in workflow(tmp_path, text))
+
+
+def test_workflow_flow_style_job(tmp_path):
+    assert workflow(tmp_path, f"jobs:\n  b: {{uses: {CALL}main}}\n") == []
+
+
+def test_workflow_flow_style_job_checks_spec_ref(tmp_path):
+    problems = workflow(tmp_path, f"jobs:\n  b: {{uses: {CALL}v1, with: {{spec-ref: main}}}}\n")
+    assert len(problems) == 1 and "@v1" in problems[0]
