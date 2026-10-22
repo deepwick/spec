@@ -208,6 +208,11 @@ ones that apply in their README Notes, using these descriptions:
   keyword (Blue); its definition and meta tokens are Yellow (Python function
   names, decorators), which also makes JavaScript/TypeScript variable
   declarations and C preprocessor lines Yellow.
+- **pi** (highlight.js through nine theme roles, colors only): comments are not
+  italic; control flow is Blue; class names share the function color (Yellow);
+  `True`/`None`/`undefined` share the number color (Sage); builtins (`print`,
+  `console`) share the type color (Teal); docstrings and regex literals are
+  Orange; decorators are Comment; diffs have no line backgrounds.
 
 ## Rules for ports
 
