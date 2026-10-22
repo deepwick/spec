@@ -2,6 +2,7 @@ import itertools
 import os
 import shutil
 import subprocess
+import tempfile
 import time
 from pathlib import Path
 
@@ -55,16 +56,27 @@ def capture(
     after: str | None = None,
     timeout: float = 15.0,
     settle: float = 0.4,
+    background: str | None = None,
 ) -> str:
     socket = f"deepwick-test-{os.getpid()}-{next(_counter)}"
     base = ["tmux", "-L", socket, "-f", "/dev/null"]
+    # A detached tmux has no client to answer background queries (OSC 11); a pane background
+    # lets tmux answer them itself, for apps that pick dark/light themes from the reply.
+    conf = None
+    if background:
+        conf = tempfile.NamedTemporaryFile("w", prefix="deepwick-tmux-", suffix=".conf", delete=False)
+        conf.write(f'set -g window-style "bg={background}"\n')
+        conf.close()
+    start = ["tmux", "-L", socket, "-f", conf.name] if conf else base
     env_args: list[str] = []
     for key, value in {"COLORTERM": "truecolor", **(env or {})}.items():
         env_args += ["-e", f"{key}={value}"]
     started = subprocess.run(
-        [*base, "new-session", "-d", "-P", "-F", "#{socket_path}", "-x", str(size[0]), "-y", str(size[1]), *env_args, command],
+        [*start, "new-session", "-d", "-P", "-F", "#{socket_path}", "-x", str(size[0]), "-y", str(size[1]), *env_args, command],
         capture_output=True, text=True,
     )
+    if conf:
+        os.unlink(conf.name)
     if started.returncode != 0:
         subprocess.run([*base, "kill-server"], capture_output=True)
         default_dir = Path(os.environ.get("TMUX_TMPDIR") or "/tmp") / f"tmux-{os.getuid()}"

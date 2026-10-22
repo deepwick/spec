@@ -73,3 +73,25 @@ def test_capture_reports_tmux_errors(tmpdir, monkeypatch):
     with pytest.raises(RuntimeError, match="width too small|size"):
         capture("true", size=(0, 0))
     assert set(sockets.glob(f"deepwick-test-{os.getpid()}-*")) == before, "failed new-session left its socket"
+
+
+# Asks the terminal for its background colour (OSC 11) and prints the reply, or "no reply".
+OSC11_PROBE = r"""python3 -c '
+import os, select, sys, termios, tty
+fd = sys.stdin.fileno(); old = termios.tcgetattr(fd); tty.setraw(fd)
+os.write(1, b"\x1b]11;?\x1b\\")
+r, _, _ = select.select([fd], [], [], 2)
+reply = os.read(fd, 64) if r else b""
+termios.tcsetattr(fd, termios.TCSADRAIN, old)
+print("reply:", "rgb:" + reply.decode(errors="replace").split("rgb:")[-1][:14] if b"rgb:" in reply else "no reply")
+import time; time.sleep(5)
+'"""
+
+
+def test_capture_background_answers_osc11():
+    text = capture(OSC11_PROBE, background="#04041a", wait_for="reply:")
+    assert "reply: rgb:0404/0404/1a1a" in text
+
+
+def test_capture_without_background_leaves_osc11_unanswered():
+    assert "reply: no reply" in capture(OSC11_PROBE, wait_for="reply:")
