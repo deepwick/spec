@@ -32,6 +32,14 @@ def xterm256_report(palette: Palette) -> list[tuple[str, str, float, bool]]:
     return rows
 
 
+def duplicate_indices(palette: Palette) -> dict[int, list[str]]:
+    """xterm256 indices shared by more than one color."""
+    by_index: dict[int, list[str]] = {}
+    for name, index in palette.xterm256.items():
+        by_index.setdefault(index, []).append(name)
+    return {index: names for index, names in by_index.items() if len(names) > 1}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="check-contrast",
@@ -60,6 +68,9 @@ def main(argv: list[str] | None = None) -> int:
     failures = [row for row in rows if not row[3]]
     if failures:
         print(f"{len(failures)} text color(s) below {MIN_TEXT_CONTRAST}:1 on background", file=sys.stderr)
+        status = 1
+    for index, names in duplicate_indices(palette).items():
+        print(f"256-color index {index} is shared by {', '.join(names)}", file=sys.stderr)
         status = 1
     xt_failures = [row for row in xt_rows if not row[3]]
     if xt_failures:

@@ -1,6 +1,6 @@
 import pytest
 
-from deepwick_spec.check_contrast import MIN_TEXT_CONTRAST, contrast_report, main, xterm256_report
+from deepwick_spec.check_contrast import MIN_TEXT_CONTRAST, contrast_report, duplicate_indices, main, xterm256_report
 from deepwick_spec.palette import load_palette
 
 
@@ -65,3 +65,13 @@ def test_main_exits_1_on_xterm256_failure(palette_data, write_palette, capsys):
     palette_data["xterm256"]["diffAddedEmph"] = 28
     assert main(["--palette", str(write_palette(palette_data))]) == 1
     assert "FAIL" in capsys.readouterr().out
+
+
+def test_real_palette_has_no_duplicate_indices():
+    assert duplicate_indices(load_palette()) == {}
+
+
+def test_duplicate_index_fails(palette_data, write_palette, capsys):
+    palette_data["xterm256"]["sage"] = 151
+    assert main(["--palette", str(write_palette(palette_data))]) == 1
+    assert "151" in capsys.readouterr().err

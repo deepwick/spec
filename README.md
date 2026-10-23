@@ -87,7 +87,7 @@ different jobs apart (mint and sage), spread the dark backgrounds
 (233 / 235 / 237) so panels and striped rows show, and tint the diff
 backgrounds so add, remove and change stay distinct. Every text color is at
 least 4.5:1 on 233, and Foreground is at least 4.5:1 on Selection and every
-diff background (`check-contrast`). Indices 0–15 are never used: terminals
+diff background, and no two colors share an index (`check-contrast`). Indices 0–15 are never used: terminals
 theme them.
 
 Ports that use the 16 ANSI slots on purpose (tig, nnn) stay on them, because
