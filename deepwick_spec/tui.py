@@ -1,6 +1,7 @@
 import itertools
 import os
 import shutil
+import signal
 import subprocess
 import tempfile
 import time
@@ -43,6 +44,18 @@ def _wait(base: list[str], wait_for: str | None, timeout: float, settle: float, 
         previous = current
     target = f"for {wait_for!r}" if wait_for else "for the pane to settle"
     raise TimeoutError(f"timed out waiting {target}; pane text:\n{plain(current)}")
+
+
+def _kill_pane(base: list[str]) -> None:
+    # kill-server hangs up the pane, and apps that handle SIGHUP (xonsh) then write to the dead
+    # pty, crash on EIO and trigger desktop crash reporters. SIGKILL runs no handlers.
+    shown = subprocess.run([*base, "display-message", "-p", "-t", "0", "#{pane_pid}"], capture_output=True, text=True)
+    if shown.returncode != 0 or not shown.stdout.strip().isdigit():
+        return
+    try:
+        os.killpg(int(shown.stdout.strip()), signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        pass
 
 
 def capture(
@@ -93,6 +106,7 @@ def capture(
             subprocess.run([*base, "send-keys", "-t", "0", key], check=True)
         return _wait(base, after, timeout, settle, changed_from=None if after else text)
     finally:
+        _kill_pane(base)
         subprocess.run([*base, "kill-server"], capture_output=True)
         # tmux never unlinks its socket on exit, and unique names mean nothing reuses it.
         if socket_path:

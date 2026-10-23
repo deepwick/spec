@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 
 import pytest
@@ -95,3 +96,12 @@ def test_capture_background_answers_osc11():
 
 def test_capture_without_background_leaves_osc11_unanswered():
     assert "reply: no reply" in capture(OSC11_PROBE, wait_for="reply:")
+
+
+def test_capture_kills_app_without_hangup(tmp_path):
+    marker = tmp_path / "hup"
+    script = tmp_path / "app.sh"
+    script.write_text(f"trap 'touch {marker}' HUP\necho ready\nwhile :; do sleep 0.1; done\n")
+    capture(f"bash {script}", wait_for="ready")
+    time.sleep(0.5)
+    assert not marker.exists()
