@@ -32,6 +32,7 @@ class Palette:
     syntax: dict[str, SyntaxStyle]
     files: dict[str, SyntaxStyle]
     text_colors: tuple[str, ...]
+    xterm256: dict[str, int]
 
     def allowed_hex(self) -> frozenset[str]:
         return frozenset(normalize_hex(v) for v in (*self.colors.values(), *self.ansi.values()))
@@ -80,9 +81,10 @@ def parse_palette(data: dict) -> Palette:
         syntax_raw = data["syntax"]
         files_raw = data["files"]
         text_colors = data["textColors"]
+        xterm256 = data["xterm256"]
     except KeyError as e:
         raise PaletteError(f"missing top-level key: {e.args[0]}") from None
-    for key, value in (("colors", colors), ("ansi", ansi), ("terminal", terminal), ("ui", ui), ("syntax", syntax_raw), ("files", files_raw)):
+    for key, value in (("colors", colors), ("ansi", ansi), ("terminal", terminal), ("ui", ui), ("syntax", syntax_raw), ("files", files_raw), ("xterm256", xterm256)):
         _expect(key, value, dict, "an object")
     _expect("textColors", text_colors, list, "a list")
     if not text_colors:
@@ -100,6 +102,14 @@ def parse_palette(data: dict) -> Palette:
         raise PaletteError(f"ansi: missing {missing}, unexpected {extra}")
     for key, value in ansi.items():
         _check_hex(f"ansi.{key}", value)
+
+    if set(xterm256) != set(colors):
+        missing = sorted(set(colors) - set(xterm256))
+        extra = sorted(set(xterm256) - set(colors))
+        raise PaletteError(f"xterm256: missing {missing}, unexpected {extra}")
+    for key, value in xterm256.items():
+        if not isinstance(value, int) or isinstance(value, bool) or not 16 <= value <= 255:
+            raise PaletteError(f"xterm256.{key}: expected an index in 16-255, got {value!r}")
 
     def check_ref(where: str, color_name: object) -> None:
         _expect(where, color_name, str, "a color name")
@@ -132,4 +142,4 @@ def parse_palette(data: dict) -> Palette:
     for color_name in text_colors:
         check_ref("textColors", color_name)
 
-    return Palette(name, dict(colors), dict(ansi), dict(terminal), dict(ui), syntax, files, tuple(text_colors))
+    return Palette(name, dict(colors), dict(ansi), dict(terminal), dict(ui), syntax, files, tuple(text_colors), dict(xterm256))

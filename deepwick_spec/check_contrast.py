@@ -4,8 +4,10 @@ from pathlib import Path
 
 from deepwick_spec.color import contrast_ratio
 from deepwick_spec.palette import Palette, PaletteError, load_palette
+from deepwick_spec.xterm256 import index_hex
 
 MIN_TEXT_CONTRAST = 4.5
+FOREGROUND_BACKGROUNDS = ("selection", "diffAdded", "diffRemoved", "diffChanged", "diffAddedEmph", "diffRemovedEmph", "diffText")
 
 
 def contrast_report(palette: Palette) -> list[tuple[str, str, float, bool]]:
@@ -15,6 +17,18 @@ def contrast_report(palette: Palette) -> list[tuple[str, str, float, bool]]:
         hex_ = palette.colors[name]
         ratio = contrast_ratio(hex_, background)
         rows.append((name, hex_, ratio, ratio >= MIN_TEXT_CONTRAST))
+    return rows
+
+
+def xterm256_report(palette: Palette) -> list[tuple[str, str, float, bool]]:
+    """Contrast of the 256-color palette, using each index's real color."""
+    xt = palette.xterm256
+    pairs = [(f"text {name}", name, "background") for name in palette.text_colors]
+    pairs += [(f"foreground on {name}", "foreground", name) for name in FOREGROUND_BACKGROUNDS]
+    rows = []
+    for label, fg, bg in pairs:
+        ratio = contrast_ratio(index_hex(xt[fg]), index_hex(xt[bg]))
+        rows.append((label, f"{xt[fg]}/{xt[bg]}", ratio, ratio >= MIN_TEXT_CONTRAST))
     return rows
 
 
@@ -37,8 +51,18 @@ def main(argv: list[str] | None = None) -> int:
     for name, hex_, ratio, ok in rows:
         print(f"{name:<12} {hex_:<8} {ratio:>6.2f}  {'PASS' if ok else 'FAIL'}")
 
+    xt_rows = xterm256_report(palette)
+    print(f"\n{'256-color pair':<30} {'fg/bg':<8} {'ratio':>6}  result")
+    for label, pair, ratio, ok in xt_rows:
+        print(f"{label:<30} {pair:<8} {ratio:>6.2f}  {'PASS' if ok else 'FAIL'}")
+
+    status = 0
     failures = [row for row in rows if not row[3]]
     if failures:
         print(f"{len(failures)} text color(s) below {MIN_TEXT_CONTRAST}:1 on background", file=sys.stderr)
-        return 1
-    return 0
+        status = 1
+    xt_failures = [row for row in xt_rows if not row[3]]
+    if xt_failures:
+        print(f"{len(xt_failures)} 256-color pair(s) below {MIN_TEXT_CONTRAST}:1", file=sys.stderr)
+        status = 1
+    return status

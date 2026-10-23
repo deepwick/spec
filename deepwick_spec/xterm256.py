@@ -1,5 +1,7 @@
-"""Nearest xterm-256 index for a hex color, from the fixed part of the palette (16-255).
+"""xterm-256 helpers for the fixed part of the palette (16-255).
 
+Ports read Deepwick's hand-picked 256-color palette from `Palette.xterm256`. `nearest_index` only
+proposes picks (plain RGB distance) when that palette is revised; no port should call it.
 Indices 0-15 are left out: terminals theme them, so they only match under a Deepwick terminal theme.
 """
 from deepwick_spec.color import normalize_hex

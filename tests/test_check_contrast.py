@@ -1,4 +1,6 @@
-from deepwick_spec.check_contrast import MIN_TEXT_CONTRAST, contrast_report, main
+import pytest
+
+from deepwick_spec.check_contrast import MIN_TEXT_CONTRAST, contrast_report, main, xterm256_report
 from deepwick_spec.palette import load_palette
 
 
@@ -37,3 +39,29 @@ def test_invalid_palette_exits_2(palette_data, write_palette, capsys):
 def test_missing_palette_file_exits_2(tmp_path, capsys):
     assert main(["--palette", str(tmp_path / "missing.json")]) == 2
     assert "not found" in capsys.readouterr().err
+
+
+DIFFS = ("diffAdded", "diffRemoved", "diffChanged", "diffAddedEmph", "diffRemovedEmph", "diffText")
+
+
+def test_xterm256_report_passes_on_real_palette():
+    palette = load_palette()
+    rows = xterm256_report(palette)
+    labels = {r[0] for r in rows}
+    assert {f"text {n}" for n in palette.text_colors} <= labels
+    assert {f"foreground on {n}" for n in ("selection", *DIFFS)} <= labels
+    assert all(ok for *_, ok in rows)
+
+
+def test_xterm256_report_flags_low_contrast(palette_data, write_palette):
+    from deepwick_spec.palette import load_palette as load
+    palette_data["xterm256"]["muted"] = 60
+    rows = {r[0]: r for r in xterm256_report(load(write_palette(palette_data)))}
+    assert not rows["text muted"][3]
+    assert rows["text muted"][2] == pytest.approx(3.1, abs=0.05)
+
+
+def test_main_exits_1_on_xterm256_failure(palette_data, write_palette, capsys):
+    palette_data["xterm256"]["diffAddedEmph"] = 28
+    assert main(["--palette", str(write_palette(palette_data))]) == 1
+    assert "FAIL" in capsys.readouterr().out

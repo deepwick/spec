@@ -75,6 +75,54 @@ Terminal extras: background Background, foreground Foreground, cursor
 Foreground, cursor text Background, selection Selection with Foreground text,
 bold text Foreground.
 
+## 256-color palette
+
+Some apps have no 24-bit color (Mutt, Taskwarrior, curses apps like ranger),
+and some fall back to 256 colors (Vim without `termguicolors`). Their ports
+use these hand-picked xterm-256 indices, from `xterm256` in `palette.json`.
+Never compute an index in a port.
+
+The picks start from the nearest-looking index, then keep colors with
+different jobs apart (mint and sage), spread the dark backgrounds
+(233 / 235 / 237) so panels and striped rows show, and tint the diff
+backgrounds so add, remove and change stay distinct. Every text color is at
+least 4.5:1 on 233, and Foreground is at least 4.5:1 on Selection and every
+diff background (`check-contrast`). Indices 0–15 are never used: terminals
+theme them.
+
+Ports that use the 16 ANSI slots on purpose (tig, nnn) stay on them, because
+those follow the terminal's Deepwick theme exactly.
+
+| Color | True color | Index | Index color |
+|---|---|---|---|
+| background | `#04041a` | 233 | `#121212` |
+| surface | `#10192C` | 235 | `#262626` |
+| overlay | `#1B2140` | 237 | `#3a3a3a` |
+| selection | `#264F78` | 24 | `#005f87` |
+| muted | `#6E7899` | 66 | `#5f8787` |
+| comment | `#7A86A8` | 103 | `#8787af` |
+| foreground | `#D4D4D4` | 188 | `#d7d7d7` |
+| blue | `#569CD6` | 75 | `#5fafff` |
+| lightBlue | `#9CDCFE` | 117 | `#87d7ff` |
+| cyan | `#4FC1FF` | 39 | `#00afff` |
+| teal | `#4EC9B0` | 43 | `#00d7af` |
+| mint | `#B8D7A3` | 151 | `#afd7af` |
+| yellow | `#DCDCAA` | 187 | `#d7d7af` |
+| gold | `#D7BA7D` | 179 | `#d7af5f` |
+| orange | `#CE9178` | 173 | `#d7875f` |
+| rose | `#D16969` | 167 | `#d75f5f` |
+| magenta | `#C586C0` | 176 | `#d787d7` |
+| sage | `#B5CEA8` | 108 | `#87af87` |
+| green | `#57A64A` | 71 | `#5faf5f` |
+| red | `#F44747` | 203 | `#ff5f5f` |
+| white | `#FFFFFF` | 231 | `#ffffff` |
+| diffAdded | `#152424` | 23 | `#005f5f` |
+| diffRemoved | `#341123` | 52 | `#5f0000` |
+| diffChanged | `#142240` | 17 | `#00005f` |
+| diffAddedEmph | `#1D3528` | 22 | `#005f00` |
+| diffRemovedEmph | `#4C1828` | 88 | `#870000` |
+| diffText | `#1D3252` | 18 | `#000087` |
+
 ## UI roles
 
 | Role | Color |

@@ -22,6 +22,7 @@ def test_load_real_palette():
     assert palette.colors["comment"] == "#7A86A8"
     assert palette.syntax["comment"] == SyntaxStyle("comment", ("italic",))
     assert palette.syntax["bold"] == SyntaxStyle(None, ("bold",))
+    assert palette.xterm256 == {'background': 233, 'surface': 235, 'overlay': 237, 'selection': 24, 'muted': 66, 'comment': 103, 'foreground': 188, 'blue': 75, 'lightBlue': 117, 'cyan': 39, 'teal': 43, 'mint': 151, 'yellow': 187, 'gold': 179, 'orange': 173, 'rose': 167, 'magenta': 176, 'sage': 108, 'green': 71, 'red': 203, 'white': 231, 'diffAdded': 23, 'diffRemoved': 52, 'diffChanged': 17, 'diffAddedEmph': 22, 'diffRemovedEmph': 88, 'diffText': 18}
 
 
 def test_ansi_normal_slots_reuse_named_colors():
@@ -62,9 +63,29 @@ def test_invalid_json_raises_palette_error(tmp_path):
         load_palette(path)
 
 
-def test_missing_top_level_key(palette_data):
-    del palette_data["ui"]
-    with pytest.raises(PaletteError, match="missing top-level key: ui"):
+@pytest.mark.parametrize("key", ["ui", "xterm256"])
+def test_missing_top_level_key(palette_data, key):
+    del palette_data[key]
+    with pytest.raises(PaletteError, match=f"missing top-level key: {key}"):
+        parse_palette(palette_data)
+
+
+def test_xterm256_missing_color(palette_data):
+    del palette_data["xterm256"]["overlay"]
+    with pytest.raises(PaletteError, match="xterm256"):
+        parse_palette(palette_data)
+
+
+def test_xterm256_unknown_key(palette_data):
+    palette_data["xterm256"]["ultraviolet"] = 99
+    with pytest.raises(PaletteError, match="xterm256"):
+        parse_palette(palette_data)
+
+
+@pytest.mark.parametrize("value", [15, 256, "75", True, 7.5])
+def test_xterm256_out_of_range(palette_data, value):
+    palette_data["xterm256"]["blue"] = value
+    with pytest.raises(PaletteError, match="xterm256"):
         parse_palette(palette_data)
 
 

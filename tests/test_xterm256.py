@@ -31,8 +31,6 @@ def test_accepts_any_normalizable_hex():
     assert nearest_index("#FFF") == nearest_index("0xffffff") == 231
 
 
-def test_every_palette_color_maps_and_blues_stay_distinct():
-    colors = load_palette().colors
-    indices = {name: nearest_index(value) for name, value in colors.items()}
-    assert all(16 <= i <= 255 for i in indices.values())
-    assert len({indices["blue"], indices["cyan"], indices["teal"]}) == 3
+def test_palette_indices_distinct():
+    p = load_palette()
+    assert len(set(p.xterm256.values())) == len(p.xterm256)
